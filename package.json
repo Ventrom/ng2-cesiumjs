@@ -4,8 +4,7 @@
   "description": "Angular components for WebGL scenes using Cesiumjs",
   "main": "index.ts",
   "scripts": {
-    "build": "cd src/cesium && gulp build",
-    "postinstall": "npm run build"
+    "build": "cd src/cesium && gulp build"
   },
   "repository": {
     "type": "git",
