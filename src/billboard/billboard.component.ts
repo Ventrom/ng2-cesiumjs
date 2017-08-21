@@ -1,15 +1,15 @@
-import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, ViewEncapsulation, NgZone } from '@angular/core'
+import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, ViewEncapsulation, NgZone, Input } from '@angular/core'
 import ElevationGradientImageryProvider from 'cesium-elevation-gradient/lib/ElevationGradientImageryProvider'
 
 declare var require: any
-var BuildModuleUrl: any = require('cesium/Source/Core/buildModuleUrl')
+var BuildModuleUrl: any = require('ng2-cesiumjs/cesium/Source/Core/buildModuleUrl')
 BuildModuleUrl.setBaseUrl('./cesium/')
 
-const CesiumTerrainProvider: any = require('cesium/Source/Core/CesiumTerrainProvider')
-const Viewer: any = require('cesium/Source/Widgets/Viewer/Viewer')
-const UrlTemplateImageryProvider: any = require('cesium/Source/Scene/UrlTemplateImageryProvider')
-const Rectangle: any = require('cesium/Source/Core/Rectangle')
-const GeographicTilingScheme: any = require('cesium/Source/Core/GeographicTilingScheme')
+const CesiumTerrainProvider: any = require('ng2-cesiumjs/cesium/Source/Core/CesiumTerrainProvider')
+const Viewer: any = require('ng2-cesiumjs/cesium/Source/Widgets/Viewer/Viewer')
+const UrlTemplateImageryProvider: any = require('ng2-cesiumjs/cesium/Source/Scene/UrlTemplateImageryProvider')
+const Rectangle: any = require('ng2-cesiumjs/cesium/Source/Core/Rectangle')
+const GeographicTilingScheme: any = require('ng2-cesiumjs/cesium/Source/Core/GeographicTilingScheme')
 
 @Component({
     selector: 'billboard',
