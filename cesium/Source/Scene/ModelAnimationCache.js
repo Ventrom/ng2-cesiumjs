@@ -1,7 +1,6 @@
+/*global define*/
 define([
-        './AttributeType',
         '../Core/Cartesian3',
-        '../Core/ComponentDatatype',
         '../Core/defaultValue',
         '../Core/defined',
         '../Core/LinearSpline',
@@ -9,13 +8,9 @@ define([
         '../Core/Quaternion',
         '../Core/QuaternionSpline',
         '../Core/WebGLConstants',
-        '../Core/WeightSpline',
-        '../ThirdParty/GltfPipeline/getAccessorByteStride',
-        '../ThirdParty/GltfPipeline/numberOfComponentsForType'
+        './getBinaryAccessor'
     ], function(
-        AttributeType,
         Cartesian3,
-        ComponentDatatype,
         defaultValue,
         defined,
         LinearSpline,
@@ -23,9 +18,7 @@ define([
         Quaternion,
         QuaternionSpline,
         WebGLConstants,
-        WeightSpline,
-        getAccessorByteStride,
-        numberOfComponentsForType) {
+        getBinaryAccessor) {
     'use strict';
 
     /**
@@ -33,8 +26,6 @@ define([
      */
     function ModelAnimationCache() {
     }
-
-    var dataUriRegex = /^data\:/i;
 
     function getAccessorKey(model, accessor) {
         var gltf = model.gltf;
@@ -45,14 +36,16 @@ define([
         var buffer = buffers[bufferView.buffer];
 
         var byteOffset = bufferView.byteOffset + accessor.byteOffset;
-        var byteLength = accessor.count * numberOfComponentsForType(accessor.type);
+        var byteLength = accessor.count * getBinaryAccessor(accessor).componentsPerAttribute;
 
-        var uriKey = dataUriRegex.test(buffer.uri) ? '' : buffer.uri;
-        return model.cacheKey + '//' + uriKey + '/' + byteOffset + '/' + byteLength;
+        // buffer.path will be undefined when animations are embedded.
+        return model.cacheKey + '//' + defaultValue(buffer.path, '') + '/' + byteOffset + '/' + byteLength;
     }
 
     var cachedAnimationParameters = {
     };
+
+    var axisScratch = new Cartesian3();
 
     ModelAnimationCache.getAnimationParameterValues = function(model, accessor) {
         var key = getAccessorKey(model, accessor);
@@ -60,35 +53,42 @@ define([
 
         if (!defined(values)) {
             // Cache miss
+            var loadResources = model._loadResources;
             var gltf = model.gltf;
+            var hasAxisAngle = (parseFloat(gltf.asset.version) < 1.0);
 
-            var buffers = gltf.buffers;
             var bufferViews = gltf.bufferViews;
 
             var bufferView = bufferViews[accessor.bufferView];
-            var bufferId = bufferView.buffer;
-            var buffer = buffers[bufferId];
-            var source = buffer.extras._pipeline.source;
 
             var componentType = accessor.componentType;
             var type = accessor.type;
-            var numberOfComponents = numberOfComponentsForType(type);
             var count = accessor.count;
-            var byteStride = getAccessorByteStride(gltf, accessor);
 
-            values = new Array(count);
-            var accessorByteOffset = defaultValue(accessor.byteOffset, 0);
-            var byteOffset = bufferView.byteOffset + accessorByteOffset;
-            for (var i = 0; i < count; i++) {
-                var typedArrayView = ComponentDatatype.createArrayBufferView(componentType, source.buffer, byteOffset, numberOfComponents);
-                if (type === 'SCALAR') {
-                    values[i] = typedArrayView[0];
-                } else if (type === 'VEC3') {
-                    values[i] = Cartesian3.fromArray(typedArrayView);
-                } else if (type === 'VEC4') {
-                    values[i] = Quaternion.unpack(typedArrayView);
+            // Convert typed array to Cesium types
+            var buffer = loadResources.getBuffer(bufferView);
+            var typedArray = getBinaryAccessor(accessor).createArrayBufferView(buffer.buffer, buffer.byteOffset + accessor.byteOffset, count);
+            var i;
+
+            if ((componentType === WebGLConstants.FLOAT) && (type === 'SCALAR')) {
+                values = typedArray;
+            }
+            else if ((componentType === WebGLConstants.FLOAT) && (type === 'VEC3')) {
+                values = new Array(count);
+                for (i = 0; i < count; ++i) {
+                    values[i] = Cartesian3.fromArray(typedArray, 3 * i);
                 }
-                byteOffset += byteStride;
+            } else if ((componentType === WebGLConstants.FLOAT) && (type === 'VEC4')) {
+                values = new Array(count);
+                for (i = 0; i < count; ++i) {
+                    var byteOffset = 4 * i;
+                    if (hasAxisAngle) {
+                        values[i] = Quaternion.fromAxisAngle(Cartesian3.fromArray(typedArray, byteOffset, axisScratch), typedArray[byteOffset + 3]);
+                    }
+                    else {
+                        values[i] = Quaternion.unpack(typedArray, byteOffset);
+                    }
+                }
             }
             // GLTF_SPEC: Support more parameter types when glTF supports targeting materials. https://github.com/KhronosGroup/glTF/issues/142
 
@@ -108,41 +108,47 @@ define([
         return model.cacheKey + '//' + animationName + '/' + samplerName;
     }
 
+ // GLTF_SPEC: https://github.com/KhronosGroup/glTF/issues/185
     function ConstantSpline(value) {
         this._value = value;
     }
     ConstantSpline.prototype.evaluate = function(time, result) {
         return this._value;
     };
+ // END GLTF_SPEC
 
-    ModelAnimationCache.getAnimationSpline = function(model, animationName, animation, samplerName, sampler, input, path, output) {
+    ModelAnimationCache.getAnimationSpline = function(model, animationName, animation, samplerName, sampler, parameterValues) {
         var key = getAnimationSplineKey(model, animationName, samplerName);
         var spline = cachedAnimationSplines[key];
 
         if (!defined(spline)) {
-            var times = input;
-            var controlPoints = output;
+            var times = parameterValues[sampler.input];
+            var accessor = model.gltf.accessors[animation.parameters[sampler.output]];
+            var controlPoints = parameterValues[sampler.output];
 
+// GLTF_SPEC: https://github.com/KhronosGroup/glTF/issues/185
             if ((times.length === 1) && (controlPoints.length === 1)) {
                 spline = new ConstantSpline(controlPoints[0]);
-            } else if (sampler.interpolation === 'LINEAR') {
-                if (path === 'translation' || path === 'scale') {
-                    spline = new LinearSpline({
-                        times : times,
-                        points : controlPoints
-                    });
-                } else if (path === 'rotation') {
-                    spline = new QuaternionSpline({
-                        times : times,
-                        points : controlPoints
-                    });
-                } else if (path === 'weights') {
-                    spline = new WeightSpline({
-                        times : times,
-                        weights : controlPoints
-                    });
+            } else {
+// END GLTF_SPEC
+                var componentType = accessor.componentType;
+                var type = accessor.type;
+
+                if (sampler.interpolation === 'LINEAR') {
+                    if ((componentType === WebGLConstants.FLOAT) && (type === 'VEC3')) {
+                        spline = new LinearSpline({
+                            times : times,
+                            points : controlPoints
+                        });
+                    } else if ((componentType === WebGLConstants.FLOAT) && (type === 'VEC4')) {
+                        spline = new QuaternionSpline({
+                            times : times,
+                            points : controlPoints
+                        });
+                    }
+                    // GLTF_SPEC: Support more parameter types when glTF supports targeting materials. https://github.com/KhronosGroup/glTF/issues/142
                 }
-                // GLTF_SPEC: Support more parameter types when glTF supports targeting materials. https://github.com/KhronosGroup/glTF/issues/142
+                // GLTF_SPEC: Support new interpolators. https://github.com/KhronosGroup/glTF/issues/156
             }
 
             if (defined(model.cacheKey)) {
@@ -163,30 +169,23 @@ define([
 
         if (!defined(matrices)) {
             // Cache miss
+
+            var loadResources = model._loadResources;
             var gltf = model.gltf;
-            var buffers = gltf.buffers;
             var bufferViews = gltf.bufferViews;
 
-            var bufferViewId = accessor.bufferView;
-            var bufferView = bufferViews[bufferViewId];
-            var bufferId = bufferView.buffer;
-            var buffer = buffers[bufferId];
-            var source = buffer.extras._pipeline.source;
+            var bufferView = bufferViews[accessor.bufferView];
 
             var componentType = accessor.componentType;
             var type = accessor.type;
             var count = accessor.count;
-            var byteStride = getAccessorByteStride(gltf, accessor);
-            var byteOffset = bufferView.byteOffset + accessor.byteOffset;
-            var numberOfComponents = numberOfComponentsForType(type);
+            var buffer = loadResources.getBuffer(bufferView);
+            var typedArray = getBinaryAccessor(accessor).createArrayBufferView(buffer.buffer, buffer.byteOffset + accessor.byteOffset, count);
+            matrices =  new Array(count);
 
-            matrices = new Array(count);
-
-            if ((componentType === WebGLConstants.FLOAT) && (type === AttributeType.MAT4)) {
+            if ((componentType === WebGLConstants.FLOAT) && (type === 'MAT4')) {
                 for (var i = 0; i < count; ++i) {
-                    var typedArrayView = ComponentDatatype.createArrayBufferView(componentType, source.buffer, byteOffset, numberOfComponents);
-                    matrices[i] = Matrix4.fromArray(typedArrayView);
-                    byteOffset += byteStride;
+                    matrices[i] = Matrix4.fromArray(typedArray, 16 * i);
                 }
             }
 

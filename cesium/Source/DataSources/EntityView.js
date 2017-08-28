@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/Cartesian3',
         '../Core/defaultValue',
@@ -46,7 +47,6 @@ define([
         var cartesian = positionProperty.getValue(time, that._lastCartesian);
         if (defined(cartesian)) {
             var hasBasis = false;
-            var invertVelocity = false;
             var xBasis;
             var yBasis;
             var zBasis;
@@ -54,16 +54,8 @@ define([
             if (mode === SceneMode.SCENE3D) {
                 // The time delta was determined based on how fast satellites move compared to vehicles near the surface.
                 // Slower moving vehicles will most likely default to east-north-up, while faster ones will be VVLH.
-                JulianDate.addSeconds(time, 0.001, deltaTime);
+                deltaTime = JulianDate.addSeconds(time, 0.001, deltaTime);
                 var deltaCartesian = positionProperty.getValue(deltaTime, updateTransformCartesian3Scratch1);
-
-                // If no valid position at (time + 0.001), sample at (time - 0.001) and invert the vector
-                if (!defined(deltaCartesian)) {
-                    JulianDate.addSeconds(time, -0.001, deltaTime);
-                    deltaCartesian = positionProperty.getValue(deltaTime, updateTransformCartesian3Scratch1);
-                    invertVelocity = true;
-                }
-
                 if (defined(deltaCartesian)) {
                     var toInertial = Transforms.computeFixedToIcrfMatrix(time, updateTransformMatrix3Scratch1);
                     var toInertialDelta = Transforms.computeFixedToIcrfMatrix(deltaTime, updateTransformMatrix3Scratch2);
@@ -122,11 +114,6 @@ define([
 
                         // Y is along the angular momentum vector (e.g. "orbit normal")
                         yBasis = Cartesian3.cross(zBasis, inertialDeltaCartesian, updateTransformCartesian3Scratch3);
-
-                        if(invertVelocity) {
-                            yBasis = Cartesian3.multiplyByScalar(yBasis, -1, yBasis);
-                        }
-
                         if (!Cartesian3.equalsEpsilon(yBasis, Cartesian3.ZERO, CesiumMath.EPSILON7)) {
                             // X is along the cross of y and z (right handed basis / in the direction of motion)
                             xBasis = Cartesian3.cross(yBasis, zBasis, updateTransformCartesian3Scratch1);
@@ -317,6 +304,9 @@ define([
             var hasViewFrom = defined(viewFromProperty);
 
             if (!hasViewFrom && defined(boundingSphere)) {
+                var controller = scene.screenSpaceCameraController;
+                controller.minimumZoomDistance = Math.min(controller.minimumZoomDistance, boundingSphere.radius * 0.5);
+
                 //The default HPR is not ideal for high altitude objects so
                 //we scale the pitch as we get further from the earth for a more
                 //downward view.

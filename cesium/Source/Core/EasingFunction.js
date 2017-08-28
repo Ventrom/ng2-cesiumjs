@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../ThirdParty/Tween',
         './freezeObject'

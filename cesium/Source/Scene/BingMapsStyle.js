@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/freezeObject'
     ], function(
@@ -37,31 +38,7 @@ define([
         ROAD : 'Road',
 
         /**
-         * A dark version of the road maps.
-         *
-         * @type {String}
-         * @constant
-         */
-        CANVAS_DARK : 'CanvasDark',
-
-        /**
-         * A lighter version of the road maps.
-         *
-         * @type {String}
-         * @constant
-         */
-        CANVAS_LIGHT : 'CanvasLight',
-
-        /**
-         * A grayscale version of the road maps.
-         *
-         * @type {String}
-         * @constant
-         */
-        CANVAS_GRAY : 'CanvasGray',
-
-        /**
-         * Ordnance Survey imagery. This imagery is visible only for the London, UK area.
+         * Ordnance Survey imagery
          *
          * @type {String}
          * @constant

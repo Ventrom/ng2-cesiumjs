@@ -22,6 +22,7 @@
  *   limitations under the License.
  *
  */
+/*global define*/
 define(function() {
 
 	/**

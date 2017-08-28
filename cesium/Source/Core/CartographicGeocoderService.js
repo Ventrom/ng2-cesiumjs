@@ -1,17 +1,18 @@
+/*global define*/
 define([
-        '../ThirdParty/when',
-        './Cartesian3',
-        './Check',
-        './defaultValue',
-        './defined',
-        './defineProperties'
-    ], function(
-        when,
-        Cartesian3,
-        Check,
-        defaultValue,
-        defined,
-        defineProperties) {
+    './Cartesian3',
+    './defaultValue',
+    './defineProperties',
+    './defined',
+    './DeveloperError',
+    '../ThirdParty/when'
+], function(
+    Cartesian3,
+    defaultValue,
+    defineProperties,
+    defined,
+    DeveloperError,
+    when) {
     'use strict';
 
     /**
@@ -32,7 +33,9 @@ define([
      */
     CartographicGeocoderService.prototype.geocode = function(query) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.string('query', query);
+        if (!defined(query)) {
+            throw new DeveloperError('query must be defined');
+        }
         //>>includeEnd('debug');
 
         var splitQuery = query.match(/[^\s,\n]+/g);
@@ -40,20 +43,6 @@ define([
             var longitude = +splitQuery[0];
             var latitude = +splitQuery[1];
             var height = (splitQuery.length === 3) ? +splitQuery[2] : 300.0;
-
-            if (isNaN(longitude) && isNaN(latitude)) {
-                var coordTest = /^(\d+.?\d*)([nsew])/i;
-                for (var i = 0; i < splitQuery.length; ++i) {
-                    var splitCoord = splitQuery[i].match(coordTest);
-                    if (coordTest.test(splitQuery[i]) && splitCoord.length === 3) {
-                        if (/^[ns]/i.test(splitCoord[2])) {
-                            latitude = (/^[n]/i.test(splitCoord[2])) ? +splitCoord[1] : -splitCoord[1];
-                        } else if (/^[ew]/i.test(splitCoord[2])) {
-                            longitude = (/^[e]/i.test(splitCoord[2])) ? +splitCoord[1] : -splitCoord[1];
-                        }
-                    }
-                }
-            }
 
             if (!isNaN(longitude) && !isNaN(latitude) && !isNaN(height)) {
                 var result = {

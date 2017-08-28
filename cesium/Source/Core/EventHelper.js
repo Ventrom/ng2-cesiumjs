@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './defined',
         './DeveloperError'
@@ -23,7 +24,7 @@ define([
      *
      * // later...
      * helper.removeAll();
-     *
+     * 
      * @see Event
      */
     function EventHelper() {

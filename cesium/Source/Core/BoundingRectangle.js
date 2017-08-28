@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './Cartesian2',
         './Cartographic',
@@ -168,7 +169,7 @@ define([
     var fromRectangleLowerLeft = new Cartographic();
     var fromRectangleUpperRight = new Cartographic();
     /**
-     * Computes a bounding rectangle from a rectangle.
+     * Computes a bounding rectangle from an rectangle.
      *
      * @param {Rectangle} rectangle The valid rectangle used to create a bounding rectangle.
      * @param {Object} [projection=GeographicProjection] The projection used to project the rectangle into 2D.

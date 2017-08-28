@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defined',
         '../Core/defineProperties',
@@ -5,7 +6,8 @@ define([
         '../Core/loadCRN',
         '../Core/loadImage',
         '../Core/loadImageViaBlob',
-        '../Core/loadKTX'
+        '../Core/loadKTX',
+        '../Core/throttleRequestByServer'
     ], function(
         defined,
         defineProperties,
@@ -13,7 +15,8 @@ define([
         loadCRN,
         loadImage,
         loadImageViaBlob,
-        loadKTX) {
+        loadKTX,
+        throttleRequestByServer) {
     'use strict';
 
     /**
@@ -26,7 +29,7 @@ define([
      * @see ArcGisMapServerImageryProvider
      * @see SingleTileImageryProvider
      * @see BingMapsImageryProvider
-     * @see GoogleEarthEnterpriseMapsProvider
+     * @see GoogleEarthImageryProvider
      * @see MapboxImageryProvider
      * @see createOpenStreetMapImageryProvider
      * @see WebMapTileServiceImageryProvider
@@ -265,7 +268,6 @@ define([
      * @param {Number} x The tile X coordinate.
      * @param {Number} y The tile Y coordinate.
      * @param {Number} level The tile level.
-     * @param {Request} [request] The request object. Intended for internal use only.
      * @returns {Promise.<Image|Canvas>|undefined} A promise for the image that will resolve when the image is available, or
      *          undefined if there are too many active requests to the server, and the request
      *          should be retried later.  The resolved image may be either an
@@ -306,22 +308,20 @@ define([
      *
      * @param {ImageryProvider} imageryProvider The imagery provider for the URL.
      * @param {String} url The URL of the image.
-     * @param {Request} [request] The request object. Intended for internal use only.
      * @returns {Promise.<Image|Canvas>|undefined} A promise for the image that will resolve when the image is available, or
      *          undefined if there are too many active requests to the server, and the request
      *          should be retried later.  The resolved image may be either an
      *          Image or a Canvas DOM object.
      */
-    ImageryProvider.loadImage = function(imageryProvider, url, request) {
+    ImageryProvider.loadImage = function(imageryProvider, url) {
         if (ktxRegex.test(url)) {
-            return loadKTX(url, undefined, request);
+            return throttleRequestByServer(url, loadKTX);
         } else if (crnRegex.test(url)) {
-            return loadCRN(url, undefined, request);
+            return throttleRequestByServer(url, loadCRN);
         } else if (defined(imageryProvider.tileDiscardPolicy)) {
-            return loadImageViaBlob(url, request);
+            return throttleRequestByServer(url, loadImageViaBlob);
         }
-
-        return loadImage(url, undefined, request);
+        return throttleRequestByServer(url, loadImage);
     };
 
     return ImageryProvider;

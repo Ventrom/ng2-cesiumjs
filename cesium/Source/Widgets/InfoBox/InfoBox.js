@@ -1,21 +1,22 @@
+/*global define*/
 define([
         '../../Core/buildModuleUrl',
-        '../../Core/Check',
         '../../Core/Color',
         '../../Core/defined',
         '../../Core/defineProperties',
         '../../Core/destroyObject',
+        '../../Core/DeveloperError',
         '../../ThirdParty/knockout',
         '../getElement',
         '../subscribeAndEvaluate',
         './InfoBoxViewModel'
     ], function(
         buildModuleUrl,
-        Check,
         Color,
         defined,
         defineProperties,
         destroyObject,
+        DeveloperError,
         knockout,
         getElement,
         subscribeAndEvaluate,
@@ -34,7 +35,9 @@ define([
      */
     function InfoBox(container) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('container', container);
+        if (!defined(container)) {
+            throw new DeveloperError('container is required.');
+        }
         //>>includeEnd('debug')
 
         container = getElement(container);
@@ -91,13 +94,13 @@ click: function () { closeClicked.raiseEvent(this); }');
 
             //We inject default css into the content iframe,
             //end users can remove it or add their own via the exposed frame property.
-            var cssLink = frameDocument.createElement('link');
+            var cssLink = frameDocument.createElement("link");
             cssLink.href = buildModuleUrl('Widgets/InfoBox/InfoBoxDescription.css');
-            cssLink.rel = 'stylesheet';
-            cssLink.type = 'text/css';
+            cssLink.rel = "stylesheet";
+            cssLink.type = "text/css";
 
             //div to use for description content.
-            var frameContent = frameDocument.createElement('div');
+            var frameContent = frameDocument.createElement("div");
             frameContent.className = 'cesium-infoBox-description';
 
             frameDocument.head.appendChild(cssLink);

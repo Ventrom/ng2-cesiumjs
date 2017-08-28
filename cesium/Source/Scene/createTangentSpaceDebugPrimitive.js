@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/ColorGeometryInstanceAttribute',
         '../Core/defaultValue',

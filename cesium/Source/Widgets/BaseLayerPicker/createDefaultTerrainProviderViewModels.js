@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../../Core/buildModuleUrl',
         '../../Core/CesiumTerrainProvider',
@@ -31,7 +32,7 @@ define([
             tooltip : 'High-resolution, mesh-based terrain for the entire globe. Free for use on the Internet. Closed-network options are available.\nhttp://www.agi.com',
             creationFunction : function() {
                 return new CesiumTerrainProvider({
-                    url : 'https://assets.agi.com/stk-terrain/v1/tilesets/world/tiles',
+                    url : 'https://assets.agi.com/stk-terrain/world',
                     requestWaterMask : true,
                     requestVertexNormals : true
                 });

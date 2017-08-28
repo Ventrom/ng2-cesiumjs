@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defaultValue',
         '../Core/defined',
@@ -107,8 +108,6 @@ define([
         }
         //>>includeEnd('debug');
 
-        var sizeInBytes = PixelFormat.textureSizeInBytes(pixelFormat, pixelDatatype, size, size) * 6;
-
         // Use premultiplied alpha for opaque textures should perform better on Chrome:
         // http://media.tojicode.com/webglCamp4/#20
         var preMultiplyAlpha = options.preMultiplyAlpha || ((pixelFormat === PixelFormat.RGB) || (pixelFormat === PixelFormat.LUMINANCE));
@@ -157,8 +156,6 @@ define([
         this._pixelFormat = pixelFormat;
         this._pixelDatatype = pixelDatatype;
         this._size = size;
-        this._hasMipmap = false;
-        this._sizeInBytes = sizeInBytes;
         this._preMultiplyAlpha = preMultiplyAlpha;
         this._flipY = flipY;
         this._sampler = undefined;
@@ -256,17 +253,9 @@ define([
                 return this._size;
             }
         },
-        height : {
+        height: {
             get : function() {
                 return this._size;
-            }
-        },
-        sizeInBytes : {
-            get : function() {
-                if (this._hasMipmap) {
-                    return Math.floor(this._sizeInBytes * 4 / 3);
-                }
-                return this._sizeInBytes;
             }
         },
         preMultiplyAlpha : {
@@ -316,8 +305,6 @@ define([
             throw new DeveloperError('hint is invalid.');
         }
         //>>includeEnd('debug');
-
-        this._hasMipmap = true;
 
         var gl = this._gl;
         var target = this._textureTarget;

@@ -1,6 +1,6 @@
+/*global define*/
 define([
         '../Core/BoundingSphere',
-        '../Core/Check',
         '../Core/defaultValue',
         '../Core/defined',
         '../Core/defineProperties',
@@ -28,7 +28,6 @@ define([
         './WallGeometryUpdater'
     ], function(
         BoundingSphere,
-        Check,
         defaultValue,
         defined,
         defineProperties,
@@ -70,11 +69,17 @@ define([
      */
     function DataSourceDisplay(options) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('options', options);
-        Check.typeOf.object('options.scene', options.scene);
-        Check.typeOf.object('options.dataSourceCollection', options.dataSourceCollection);
+        if (!defined(options)) {
+            throw new DeveloperError('options is required.');
+        }
+        if (!defined(options.scene)) {
+            throw new DeveloperError('scene is required.');
+        }
+        if (!defined(options.dataSourceCollection)) {
+            throw new DeveloperError('dataSourceCollection is required.');
+        }
         //>>includeEnd('debug');
-
+        
         GroundPrimitive.initializeTerrainHeights();
 
         var scene = options.scene;
@@ -234,7 +239,7 @@ define([
             this._ready = false;
             return false;
         }
-
+        
         var result = true;
 
         var i;

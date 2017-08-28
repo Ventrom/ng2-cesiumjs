@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defaultValue',
         '../Core/defined',
@@ -105,11 +106,7 @@ define([
          */
         vertexShaderSource : {
             get : function() {
-                var vs = this._vertexShaderSource;
-                if (this.material.shaderSource.search(/varying\s+float\s+v_polylineAngle;/g) !== -1) {
-                    vs = '#define POLYLINE_DASH\n' + vs;
-                }
-                return vs;
+                return this._vertexShaderSource;
             }
         },
 

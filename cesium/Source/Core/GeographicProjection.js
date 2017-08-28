@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './Cartesian3',
         './Cartographic',

@@ -1,11 +1,12 @@
+/*global define*/
 define([
         '../ThirdParty/earcut-2.1.1',
         './Cartesian2',
         './Cartesian3',
-        './Check',
         './ComponentDatatype',
         './defaultValue',
         './defined',
+        './DeveloperError',
         './Ellipsoid',
         './Geometry',
         './GeometryAttribute',
@@ -16,10 +17,10 @@ define([
         earcut,
         Cartesian2,
         Cartesian3,
-        Check,
         ComponentDatatype,
         defaultValue,
         defined,
+        DeveloperError,
         Ellipsoid,
         Geometry,
         GeometryAttribute,
@@ -41,8 +42,12 @@ define([
      */
     PolygonPipeline.computeArea2D = function(positions) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('positions', positions);
-        Check.typeOf.number.greaterThanOrEquals('positions.length', positions.length, 3);
+        if (!defined(positions)) {
+            throw new DeveloperError('positions is required.');
+        }
+        if (positions.length < 3) {
+            throw new DeveloperError('At least three positions are required.');
+        }
         //>>includeEnd('debug');
 
         var length = positions.length;
@@ -77,7 +82,9 @@ define([
      */
     PolygonPipeline.triangulate = function(positions, holes) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('positions', positions);
+        if (!defined(positions)) {
+            throw new DeveloperError('positions is required.');
+        }
         //>>includeEnd('debug');
 
         var flattenedPositions = Cartesian2.packArray(positions);
@@ -108,12 +115,24 @@ define([
         granularity = defaultValue(granularity, CesiumMath.RADIANS_PER_DEGREE);
 
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('ellipsoid', ellipsoid);
-        Check.defined('positions', positions);
-        Check.defined('indices', indices);
-        Check.typeOf.number.greaterThanOrEquals('indices.length', indices.length, 3);
-        Check.typeOf.number.equals('indices.length % 3', '0', indices.length % 3, 0);
-        Check.typeOf.number.greaterThan('granularity', granularity, 0.0);
+        if (!defined(ellipsoid)) {
+            throw new DeveloperError('ellipsoid is required.');
+        }
+        if (!defined(positions)) {
+            throw new DeveloperError('positions is required.');
+        }
+        if (!defined(indices)) {
+            throw new DeveloperError('indices is required.');
+        }
+        if (indices.length < 3) {
+            throw new DeveloperError('At least three indices are required.');
+        }
+        if (indices.length % 3 !== 0) {
+            throw new DeveloperError('The number of indices must be divisable by three.');
+        }
+        if (granularity <= 0.0) {
+            throw new DeveloperError('granularity must be greater than zero.');
+        }
         //>>includeEnd('debug');
 
         // triangles that need (or might need) to be subdivided.

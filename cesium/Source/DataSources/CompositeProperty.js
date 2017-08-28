@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defined',
         '../Core/defineProperties',
@@ -59,7 +60,7 @@ define([
      *     isStopIncluded : false,
      *     data : sampledProperty
      * }));
-     *
+     * 
      * @see CompositeMaterialProperty
      * @see CompositePositionProperty
      */

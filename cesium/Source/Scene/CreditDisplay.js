@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/Credit',
         '../Core/defaultValue',

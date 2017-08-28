@@ -1,16 +1,17 @@
+/*global define*/
 define([
         '../ThirdParty/when',
-        './Check',
         './CompressedTextureBuffer',
         './defined',
+        './DeveloperError',
         './loadArrayBuffer',
         './PixelFormat',
         './RuntimeError'
     ], function(
         when,
-        Check,
         CompressedTextureBuffer,
         defined,
+        DeveloperError,
         loadArrayBuffer,
         PixelFormat,
         RuntimeError) {
@@ -36,10 +37,9 @@ define([
      *
      * @exports loadKTX
      *
-     * @param {String|ArrayBuffer} urlOrBuffer The URL of the binary data or an ArrayBuffer.
+     * @param {String|Promise.<String>|ArrayBuffer} urlOrBuffer The URL of the binary data, a promise for the URL, or an ArrayBuffer.
      * @param {Object} [headers] HTTP headers to send with the requests.
-     * @param {Request} [request] The request object. Intended for internal use only.
-     * @returns {Promise.<CompressedTextureBuffer>|undefined} A promise that will resolve to the requested data when loaded. Returns undefined if <code>request.throttle</code> is true and the request does not have high enough priority.
+     * @returns {Promise.<CompressedTextureBuffer>} A promise that will resolve to the requested data when loaded.
      *
      * @exception {RuntimeError} Invalid KTX file.
      * @exception {RuntimeError} File is the wrong endianness.
@@ -69,20 +69,18 @@ define([
      * @see {@link http://www.w3.org/TR/cors/|Cross-Origin Resource Sharing}
      * @see {@link http://wiki.commonjs.org/wiki/Promises/A|CommonJS Promises/A}
      */
-    function loadKTX(urlOrBuffer, headers, request) {
+    function loadKTX(urlOrBuffer, headers) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('urlOrBuffer', urlOrBuffer);
+        if (!defined(urlOrBuffer)) {
+            throw new DeveloperError('urlOrBuffer is required.');
+        }
         //>>includeEnd('debug');
 
         var loadPromise;
         if (urlOrBuffer instanceof ArrayBuffer || ArrayBuffer.isView(urlOrBuffer)) {
             loadPromise = when.resolve(urlOrBuffer);
         } else {
-            loadPromise = loadArrayBuffer(urlOrBuffer, headers, request);
-        }
-
-        if (!defined(loadPromise)) {
-            return undefined;
+            loadPromise = loadArrayBuffer(urlOrBuffer, headers);
         }
 
         return loadPromise.then(function(data) {
@@ -189,8 +187,13 @@ define([
             if (glFormat !== 0) {
                 throw new RuntimeError('glFormat must be zero when the texture is compressed.');
             }
-        } else if (glBaseInternalFormat !== glFormat) {
-            throw new RuntimeError('The base internal format must be the same as the format for uncompressed textures.');
+            if (numberOfMipmapLevels === 0) {
+                throw new RuntimeError('Generating mipmaps for a compressed texture is unsupported.');
+            }
+        } else {
+            if (glBaseInternalFormat !== glFormat) {
+                throw new RuntimeError('The base internal format must be the same as the format for uncompressed textures.');
+            }
         }
 
         if (pixelDepth !== 0) {
@@ -205,11 +208,9 @@ define([
         }
 
         // Only use the level 0 mipmap
-        if (numberOfMipmapLevels > 1) {
-            var levelSize = PixelFormat.isCompressedFormat(glInternalFormat) ?
-                PixelFormat.compressedTextureSizeInBytes(glInternalFormat, pixelWidth, pixelHeight) :
-                PixelFormat.textureSizeInBytes(glInternalFormat, pixelWidth, pixelHeight);
-            texture = new Uint8Array(texture.buffer, texture.byteOffset, levelSize);
+        if (PixelFormat.isCompressedFormat(glInternalFormat) && numberOfMipmapLevels > 1) {
+            var levelSize = PixelFormat.compressedTextureSize(glInternalFormat, pixelWidth, pixelHeight);
+            texture = texture.slice(0, levelSize);
         }
 
         return new CompressedTextureBuffer(glInternalFormat, pixelWidth, pixelHeight, texture);

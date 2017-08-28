@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './clone',
         './defined',
@@ -25,12 +26,11 @@ define([
      *
      * @exports loadJson
      *
-     * @param {String} url The URL to request.
+     * @param {String|Promise.<String>} url The URL to request, or a promise for the URL.
      * @param {Object} [headers] HTTP headers to send with the request.
      * 'Accept: application/json,&#42;&#47;&#42;;q=0.01' is added to the request headers automatically
      * if not specified.
-     * @param {Request} [request] The request object. Intended for internal use only.
-     * @returns {Promise.<Object>|undefined} a promise that will resolve to the requested data when loaded. Returns undefined if <code>request.throttle</code> is true and the request does not have high enough priority.
+     * @returns {Promise.<Object>} a promise that will resolve to the requested data when loaded.
      *
      *
      * @example
@@ -39,12 +39,12 @@ define([
      * }).otherwise(function(error) {
      *     // an error occurred
      * });
-     *
+     * 
      * @see loadText
      * @see {@link http://www.w3.org/TR/cors/|Cross-Origin Resource Sharing}
      * @see {@link http://wiki.commonjs.org/wiki/Promises/A|CommonJS Promises/A}
      */
-    function loadJson(url, headers, request) {
+    function loadJson(url, headers) {
         //>>includeStart('debug', pragmas.debug);
         if (!defined(url)) {
             throw new DeveloperError('url is required.');
@@ -59,12 +59,7 @@ define([
             headers.Accept = defaultHeaders.Accept;
         }
 
-        var textPromise = loadText(url, headers, request);
-        if (!defined(textPromise)) {
-            return undefined;
-        }
-
-        return textPromise.then(function(value) {
+        return loadText(url, headers).then(function(value) {
             return JSON.parse(value);
         });
     }

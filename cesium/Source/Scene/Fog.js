@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/Cartesian3',
         '../Core/defined',
@@ -130,7 +131,7 @@ define([
 
         // Fade fog in as the camera tilts toward the horizon.
         var positionNormal = Cartesian3.normalize(camera.positionWC, scratchPositionNormal);
-        var dot = Math.abs(Cartesian3.dot(camera.directionWC, positionNormal));
+        var dot = CesiumMath.clamp(Cartesian3.dot(camera.directionWC, positionNormal), 0.0, 1.0);
         density *= 1.0 - dot;
 
         frameState.fog.density = density;

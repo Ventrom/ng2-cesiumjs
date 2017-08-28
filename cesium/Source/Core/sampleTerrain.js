@@ -1,9 +1,12 @@
+/*global define*/
 define([
         '../ThirdParty/when',
-        './Check'
+        './defined',
+        './DeveloperError'
     ], function(
         when,
-        Check) {
+        defined,
+        DeveloperError) {
     'use strict';
 
     /**
@@ -28,7 +31,7 @@ define([
      * @example
      * // Query the terrain height of two Cartographic positions
      * var terrainProvider = new Cesium.CesiumTerrainProvider({
-     *     url : 'https://assets.agi.com/stk-terrain/v1/tilesets/world/tiles'
+     *     url : 'https://assets.agi.com/stk-terrain/world'
      * });
      * var positions = [
      *     Cesium.Cartographic.fromDegrees(86.925145, 27.988257),
@@ -42,9 +45,15 @@ define([
      */
     function sampleTerrain(terrainProvider, level, positions) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('terrainProvider', terrainProvider);
-        Check.typeOf.number('level', level);
-        Check.defined('positions', positions);
+        if (!defined(terrainProvider)) {
+            throw new DeveloperError('terrainProvider is required.');
+        }
+        if (!defined(level)) {
+            throw new DeveloperError('level is required.');
+        }
+        if (!defined(positions)) {
+            throw new DeveloperError('positions is required.');
+        }
         //>>includeEnd('debug');
 
         var deferred = when.defer();
@@ -98,7 +107,7 @@ define([
         var tilePromises = [];
         for (i = 0; i < tileRequests.length; ++i) {
             var tileRequest = tileRequests[i];
-            var requestPromise = tileRequest.terrainProvider.requestTileGeometry(tileRequest.x, tileRequest.y, tileRequest.level);
+            var requestPromise = tileRequest.terrainProvider.requestTileGeometry(tileRequest.x, tileRequest.y, tileRequest.level, false);
             var tilePromise = when(requestPromise, createInterpolateFunction(tileRequest), createMarkFailedFunction(tileRequest));
             tilePromises.push(tilePromise);
         }

@@ -1,10 +1,11 @@
+/*global define*/
 define([
         './BoundingSphere',
         './Cartesian3',
-        './Check',
         './ComponentDatatype',
         './defaultValue',
         './defined',
+        './DeveloperError',
         './Geometry',
         './GeometryAttribute',
         './GeometryAttributes',
@@ -13,10 +14,10 @@ define([
     ], function(
         BoundingSphere,
         Cartesian3,
-        Check,
         ComponentDatatype,
         defaultValue,
         defined,
+        DeveloperError,
         Geometry,
         GeometryAttribute,
         GeometryAttributes,
@@ -58,8 +59,12 @@ define([
         var max = options.maximum;
 
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('min', min);
-        Check.typeOf.object('max', max);
+        if (!defined(min)) {
+            throw new DeveloperError('options.minimum is required.');
+        }
+        if (!defined(max)) {
+            throw new DeveloperError('options.maximum is required');
+        }
         //>>includeEnd('debug');
 
         var vertexFormat = defaultValue(options.vertexFormat, VertexFormat.DEFAULT);
@@ -95,10 +100,12 @@ define([
         var dimensions = options.dimensions;
 
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('dimensions', dimensions);
-        Check.typeOf.number.greaterThanOrEquals('dimensions.x', dimensions.x, 0);
-        Check.typeOf.number.greaterThanOrEquals('dimensions.y', dimensions.y, 0);
-        Check.typeOf.number.greaterThanOrEquals('dimensions.z', dimensions.z, 0);
+        if (!defined(dimensions)) {
+            throw new DeveloperError('options.dimensions is required.');
+        }
+        if (dimensions.x < 0 || dimensions.y < 0 || dimensions.z < 0) {
+            throw new DeveloperError('All dimensions components must be greater than or equal to zero.');
+        }
         //>>includeEnd('debug');
 
         var corner = Cartesian3.multiplyByScalar(dimensions, 0.5, new Cartesian3());
@@ -132,7 +139,9 @@ define([
      */
     BoxGeometry.fromAxisAlignedBoundingBox = function (boundingBox) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('boundingBox', boundingBox);
+        if (!defined(boundingBox)) {
+            throw new DeveloperError('boundingBox is required.');
+        }
         //>>includeEnd('debug');
 
         return new BoxGeometry({
@@ -158,8 +167,12 @@ define([
      */
     BoxGeometry.pack = function(value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('value', value);
-        Check.defined('array', array);
+        if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
         //>>includeEnd('debug');
 
         startingIndex = defaultValue(startingIndex, 0);
@@ -190,7 +203,9 @@ define([
      */
     BoxGeometry.unpack = function(array, startingIndex, result) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('array', array);
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
         //>>includeEnd('debug');
 
         startingIndex = defaultValue(startingIndex, 0);

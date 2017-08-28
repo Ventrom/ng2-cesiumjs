@@ -4,6 +4,7 @@
  * Rich Tibbett
  * MIT license
  **/
+/*global define*/
 define(function() {
     "use strict";
 

@@ -1,18 +1,19 @@
+/*global define*/
 define([
         './BoundingSphere',
         './Cartesian3',
-        './Check',
         './defaultValue',
         './defined',
         './defineProperties',
+        './DeveloperError',
         './Rectangle'
     ], function(
         BoundingSphere,
         Cartesian3,
-        Check,
         defaultValue,
         defined,
         defineProperties,
+        DeveloperError,
         Rectangle) {
     'use strict';
 
@@ -41,7 +42,9 @@ define([
      */
     function EllipsoidalOccluder(ellipsoid, cameraPosition) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('ellipsoid', ellipsoid);
+        if (!defined(ellipsoid)) {
+            throw new DeveloperError('ellipsoid is required.');
+        }
         //>>includeEnd('debug');
 
         this._ellipsoid = ellipsoid;
@@ -156,8 +159,12 @@ define([
      */
     EllipsoidalOccluder.prototype.computeHorizonCullingPoint = function(directionToPoint, positions, result) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('directionToPoint', directionToPoint);
-        Check.defined('positions', positions);
+        if (!defined(directionToPoint)) {
+            throw new DeveloperError('directionToPoint is required');
+        }
+        if (!defined(positions)) {
+            throw new DeveloperError('positions is required');
+        }
         //>>includeEnd('debug');
 
         if (!defined(result)) {
@@ -199,9 +206,15 @@ define([
      */
     EllipsoidalOccluder.prototype.computeHorizonCullingPointFromVertices = function(directionToPoint, vertices, stride, center, result) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('directionToPoint', directionToPoint);
-        Check.defined('vertices', vertices);
-        Check.typeOf.number('stride', stride);
+        if (!defined(directionToPoint)) {
+            throw new DeveloperError('directionToPoint is required');
+        }
+        if (!defined(vertices)) {
+            throw new DeveloperError('vertices is required');
+        }
+        if (!defined(stride)) {
+            throw new DeveloperError('stride is required');
+        }
         //>>includeEnd('debug');
 
         if (!defined(result)) {
@@ -228,7 +241,7 @@ define([
     var subsampleScratch = [];
 
     /**
-     * Computes a point that can be used for horizon culling of a rectangle.  If the point is below
+     * Computes a point that can be used for horizon culling of an rectangle.  If the point is below
      * the horizon, the ellipsoid-conforming rectangle is guaranteed to be below the horizon as well.
      * The returned point is expressed in the ellipsoid-scaled space and is suitable for use with
      * {@link EllipsoidalOccluder#isScaledSpacePointVisible}.
@@ -241,7 +254,9 @@ define([
      */
     EllipsoidalOccluder.prototype.computeHorizonCullingPointFromRectangle = function(rectangle, ellipsoid, result) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('rectangle', rectangle);
+        if (!defined(rectangle)) {
+            throw new DeveloperError('rectangle is required.');
+        }
         //>>includeEnd('debug');
 
         var positions = Rectangle.subsample(rectangle, ellipsoid, 0.0, subsampleScratch);

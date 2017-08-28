@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/Cartesian3',
         '../Core/Cartesian4',
@@ -166,9 +167,8 @@ define([
             return undefined;
         }
 
-        var mode = frameState.mode;
-        if ((mode !== SceneMode.SCENE3D) &&
-            (mode !== SceneMode.MORPHING)) {
+        if ((frameState.mode !== SceneMode.SCENE3D) &&
+            (frameState.mode !== SceneMode.MORPHING)) {
             return undefined;
         }
 
@@ -305,7 +305,7 @@ define([
      *
      * @example
      * skyAtmosphere = skyAtmosphere && skyAtmosphere.destroy();
-     *
+     * 
      * @see SkyAtmosphere#isDestroyed
      */
     SkyAtmosphere.prototype.destroy = function() {

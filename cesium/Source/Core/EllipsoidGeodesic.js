@@ -1,19 +1,20 @@
+/*global define*/
 define([
         './Cartesian3',
         './Cartographic',
-        './Check',
         './defaultValue',
         './defined',
         './defineProperties',
+        './DeveloperError',
         './Ellipsoid',
         './Math'
     ], function(
         Cartesian3,
         Cartographic,
-        Check,
         defaultValue,
         defined,
         defineProperties,
+        DeveloperError,
         Ellipsoid,
         CesiumMath) {
     'use strict';
@@ -171,14 +172,14 @@ define([
         ellipsoidGeodesic._uSquared = uSquared;
     }
 
-    var scratchCart1 = new Cartesian3();
-    var scratchCart2 = new Cartesian3();
     function computeProperties(ellipsoidGeodesic, start, end, ellipsoid) {
         var firstCartesian = Cartesian3.normalize(ellipsoid.cartographicToCartesian(start, scratchCart2), scratchCart1);
         var lastCartesian = Cartesian3.normalize(ellipsoid.cartographicToCartesian(end, scratchCart2), scratchCart2);
 
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.number.greaterThanOrEquals('value', Math.abs(Math.abs(Cartesian3.angleBetween(firstCartesian, lastCartesian)) - Math.PI), 0.0125);
+        if (Math.abs(Math.abs(Cartesian3.angleBetween(firstCartesian, lastCartesian)) - Math.PI) < 0.0125) {
+            throw new DeveloperError('geodesic position is not unique');
+        }
         //>>includeEnd('debug');
 
         vincentyInverseFormula(ellipsoidGeodesic, ellipsoid.maximumRadius, ellipsoid.minimumRadius,
@@ -192,6 +193,8 @@ define([
         setConstants(ellipsoidGeodesic);
     }
 
+    var scratchCart1 = new Cartesian3();
+    var scratchCart2 = new Cartesian3();
     /**
      * Initializes a geodesic on the ellipsoid connecting the two provided planetodetic points.
      *
@@ -241,7 +244,9 @@ define([
         surfaceDistance : {
             get : function() {
                 //>>includeStart('debug', pragmas.debug);
-                Check.defined('distance', this._distance);
+                if (!defined(this._distance)) {
+                    throw new DeveloperError('set end positions before getting surfaceDistance');
+                }
                 //>>includeEnd('debug');
 
                 return this._distance;
@@ -281,7 +286,9 @@ define([
         startHeading : {
             get : function() {
                 //>>includeStart('debug', pragmas.debug);
-                Check.defined('distance', this._distance);
+                if (!defined(this._distance)) {
+                    throw new DeveloperError('set end positions before getting startHeading');
+                }
                 //>>includeEnd('debug');
 
                 return this._startHeading;
@@ -297,7 +304,9 @@ define([
         endHeading : {
             get : function() {
                 //>>includeStart('debug', pragmas.debug);
-                Check.defined('distance', this._distance);
+                if (!defined(this._distance)) {
+                    throw new DeveloperError('set end positions before getting endHeading');
+                }
                 //>>includeEnd('debug');
 
                 return this._endHeading;
@@ -313,8 +322,12 @@ define([
      */
     EllipsoidGeodesic.prototype.setEndPoints = function(start, end) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('start', start);
-        Check.defined('end', end);
+        if (!defined(start)) {
+            throw new DeveloperError('start cartographic position is required');
+        }
+        if (!defined(end)) {
+            throw new DeveloperError('end cartgraphic position is required');
+        }
         //>>includeEnd('debug');
 
         computeProperties(this, start, end, this._ellipsoid);
@@ -342,7 +355,9 @@ define([
      */
     EllipsoidGeodesic.prototype.interpolateUsingSurfaceDistance = function(distance, result) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('distance', this._distance);
+        if (!defined(this._distance)) {
+            throw new DeveloperError('start and end must be set before calling function interpolateUsingSurfaceDistance');
+        }
         //>>includeEnd('debug');
 
         var constants = this._constants;

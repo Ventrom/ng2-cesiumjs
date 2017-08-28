@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './loadWithXhr'
     ], function(
@@ -12,10 +13,9 @@ define([
      *
      * @exports loadXML
      *
-     * @param {String} url The URL to request.
+     * @param {String|Promise.<String>} url The URL to request, or a promise for the URL.
      * @param {Object} [headers] HTTP headers to send with the request.
-     * @param {Request} [request] The request object. Intended for internal use only.
-     * @returns {Promise.<XMLDocument>|undefined} a promise that will resolve to the requested data when loaded. Returns undefined if <code>request.throttle</code> is true and the request does not have high enough priority.
+     * @returns {Promise.<XMLDocument>} a promise that will resolve to the requested data when loaded.
      *
      *
      * @example
@@ -27,18 +27,17 @@ define([
      * }).otherwise(function(error) {
      *     // an error occurred
      * });
-     *
+     * 
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest|XMLHttpRequest}
      * @see {@link http://www.w3.org/TR/cors/|Cross-Origin Resource Sharing}
      * @see {@link http://wiki.commonjs.org/wiki/Promises/A|CommonJS Promises/A}
      */
-    function loadXML(url, headers, request) {
+    function loadXML(url, headers) {
         return loadWithXhr({
             url : url,
             responseType : 'document',
             headers : headers,
-            overrideMimeType : 'text/xml',
-            request : request
+            overrideMimeType : 'text/xml'
         });
     }
 

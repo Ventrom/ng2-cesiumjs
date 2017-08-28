@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './CubicRealPolynomial',
         './DeveloperError',
@@ -230,8 +231,9 @@ define([
                         return [roots1[0], roots2[0], roots2[1], roots1[1]];
                     } else if (roots1[0] > roots2[0] && roots1[0] < roots2[1]) {
                         return [roots2[0], roots1[0], roots2[1], roots1[1]];
+                    } else {
+                        return [roots1[0], roots2[0], roots1[1], roots2[1]];
                     }
-                    return [roots1[0], roots2[0], roots1[1], roots2[1]];
                 }
                 return roots1;
             }

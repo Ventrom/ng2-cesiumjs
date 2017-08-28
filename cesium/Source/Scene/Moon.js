@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/buildModuleUrl',
         '../Core/Cartesian3',
@@ -44,7 +45,7 @@ define([
      *
      * @example
      * scene.moon = new Cesium.Moon();
-     *
+     * 
      * @see Scene#moon
      */
     function Moon(options) {
@@ -176,7 +177,7 @@ define([
      *
      * @example
      * moon = moon && moon.destroy();
-     *
+     * 
      * @see Moon#isDestroyed
      */
     Moon.prototype.destroy = function() {

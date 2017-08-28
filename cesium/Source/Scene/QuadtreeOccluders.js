@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/Cartesian3',
         '../Core/defineProperties',

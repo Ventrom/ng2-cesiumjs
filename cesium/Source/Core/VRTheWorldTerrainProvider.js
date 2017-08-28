@@ -1,10 +1,10 @@
+/*global define*/
 define([
         '../ThirdParty/when',
         './Credit',
         './defaultValue',
         './defined',
         './defineProperties',
-        './deprecationWarning',
         './DeveloperError',
         './Ellipsoid',
         './Event',
@@ -15,9 +15,8 @@ define([
         './loadXML',
         './Math',
         './Rectangle',
-        './Request',
-        './RequestType',
         './TerrainProvider',
+        './throttleRequestByServer',
         './TileProviderError'
     ], function(
         when,
@@ -25,7 +24,6 @@ define([
         defaultValue,
         defined,
         defineProperties,
-        deprecationWarning,
         DeveloperError,
         Ellipsoid,
         Event,
@@ -36,9 +34,8 @@ define([
         loadXML,
         CesiumMath,
         Rectangle,
-        Request,
-        RequestType,
         TerrainProvider,
+        throttleRequestByServer,
         TileProviderError) {
     'use strict';
 
@@ -259,12 +256,14 @@ define([
      * @param {Number} x The X coordinate of the tile for which to request geometry.
      * @param {Number} y The Y coordinate of the tile for which to request geometry.
      * @param {Number} level The level of the tile for which to request geometry.
-     * @param {Request} [request] The request object. Intended for internal use only.
+     * @param {Boolean} [throttleRequests=true] True if the number of simultaneous requests should be limited,
+     *                  or false if the request should be initiated regardless of the number of requests
+     *                  already in progress.
      * @returns {Promise.<TerrainData>|undefined} A promise for the requested geometry.  If this method
      *          returns undefined instead of a promise, it is an indication that too many requests are already
      *          pending and the request will be retried later.
      */
-    VRTheWorldTerrainProvider.prototype.requestTileGeometry = function(x, y, level, request) {
+    VRTheWorldTerrainProvider.prototype.requestTileGeometry = function(x, y, level, throttleRequests) {
         //>>includeStart('debug', pragmas.debug);
         if (!this.ready) {
             throw new DeveloperError('requestTileGeometry must not be called before ready returns true.');
@@ -279,18 +278,16 @@ define([
             url = proxy.getURL(url);
         }
 
-        if (typeof request === 'boolean') {
-            deprecationWarning('throttleRequests', 'The throttleRequest parameter for requestTileGeometry was deprecated in Cesium 1.35.  It will be removed in 1.37.');
-            request = new Request({
-                throttle : request,
-                throttleByServer : request,
-                type : RequestType.TERRAIN
-            });
-        }
+        var promise;
 
-        var promise = loadImage(url, undefined, request);
-        if (!defined(promise)) {
-            return undefined;
+        throttleRequests = defaultValue(throttleRequests, true);
+        if (throttleRequests) {
+            promise = throttleRequestByServer(url, loadImage);
+            if (!defined(promise)) {
+                return undefined;
+            }
+        } else {
+            promise = loadImage(url);
         }
 
         var that = this;

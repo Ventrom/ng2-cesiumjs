@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/freezeObject',
         '../Core/WebGLConstants'
@@ -34,27 +35,9 @@ define([
          * @type {Number}
          * @constant
          */
-        REVERSE_SUBTRACT : WebGLConstants.FUNC_REVERSE_SUBTRACT,
+        REVERSE_SUBTRACT : WebGLConstants.FUNC_REVERSE_SUBTRACT
 
-        /**
-         * Pixel values are given to the minimum function (min(source, destination)).
-         *
-         * This equation operates on each pixel color component.
-         *
-         * @type {Number}
-         * @constant
-         */
-        MIN : WebGLConstants.MIN,
-
-        /**
-         * Pixel values are given to the maximum function (max(source, destination)).
-         *
-         * This equation operates on each pixel color component.
-         *
-         * @type {Number}
-         * @constant
-         */
-        MAX : WebGLConstants.MAX
+        // No min and max like in ColladaFX GLES2 profile
     };
 
     return freezeObject(BlendEquation);

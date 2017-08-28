@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/BoundingRectangle',
         '../Core/Cartesian2',
@@ -106,10 +107,6 @@ define([
         if (defined(billboard)) {
             billboard.show = false;
             billboard.image = undefined;
-            if (defined(billboard._removeCallbackFunc)) {
-                billboard._removeCallbackFunc();
-                billboard._removeCallbackFunc = undefined;
-            }
             labelCollection._spareBillboards.push(billboard);
             glyph.billboard = undefined;
         }
@@ -174,7 +171,6 @@ define([
             backgroundBillboard.pixelOffsetScaleByDistance = label._pixelOffsetScaleByDistance;
             backgroundBillboard.scaleByDistance = label._scaleByDistance;
             backgroundBillboard.distanceDisplayCondition = label._distanceDisplayCondition;
-            backgroundBillboard.disableDepthTestDistance = label._disableDepthTestDistance;
         }
 
         var glyphTextureCache = labelCollection._glyphTextureCache;
@@ -222,10 +218,12 @@ define([
                     // no texture, and therefore no billboard, for this glyph.
                     // so, completely unbind glyph.
                     unbindGlyph(labelCollection, glyph);
-                } else if (defined(glyph.textureInfo)) {
+                } else {
                     // we have a texture and billboard.  If we had one before, release
                     // our reference to that texture info, but reuse the billboard.
-                    glyph.textureInfo = undefined;
+                    if (defined(glyph.textureInfo)) {
+                        glyph.textureInfo = undefined;
+                    }
                 }
             } else {
                 // create a glyph object
@@ -266,7 +264,6 @@ define([
                 billboard.pixelOffsetScaleByDistance = label._pixelOffsetScaleByDistance;
                 billboard.scaleByDistance = label._scaleByDistance;
                 billboard.distanceDisplayCondition = label._distanceDisplayCondition;
-                billboard.disableDepthTestDistance = label._disableDepthTestDistance;
             }
         }
 

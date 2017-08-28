@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/Color',
         '../Core/ColorGeometryInstanceAttribute',
@@ -244,7 +245,7 @@ define([
          * Gets the property specifying whether the geometry
          * casts or receives shadows from each light source.
          * @memberof RectangleGeometryUpdater.prototype
-         *
+         * 
          * @type {Property}
          * @readonly
          */

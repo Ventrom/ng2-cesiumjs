@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defaultValue',
         '../Core/defined',
@@ -42,8 +43,6 @@ define([
         this._showSubscription = undefined;
         this._material = undefined;
         this._materialSubscription = undefined;
-        this._depthFailMaterial = undefined;
-        this._depthFailMaterialSubscription = undefined;
         this._positions = undefined;
         this._positionsSubscription = undefined;
         this._followSurface = undefined;
@@ -93,17 +92,6 @@ define([
         material : createMaterialPropertyDescriptor('material'),
 
         /**
-         * Gets or sets the Property specifying the material used to draw the polyline when it fails the depth test.
-         * <p>
-         * Requires the EXT_frag_depth WebGL extension to render properly. If the extension is not supported,
-         * there may be artifacts.
-         * </p>
-         * @type {MaterialProperty}
-         * @default undefined
-         */
-        depthFailMaterial : createMaterialPropertyDescriptor('depthFailMaterial'),
-
-        /**
          * Gets or sets the Property specifying the array of {@link Cartesian3}
          * positions that define the line strip.
          * @memberof PolylineGraphics.prototype
@@ -135,7 +123,7 @@ define([
          * @default Cesium.Math.RADIANS_PER_DEGREE
          */
         granularity : createPropertyDescriptor('granularity'),
-
+        
         /**
          * Get or sets the enum Property specifying whether the polyline
          * casts or receives shadows from each light source.
@@ -165,7 +153,6 @@ define([
         }
         result.show = this.show;
         result.material = this.material;
-        result.depthFailMaterial = this.depthFailMaterial;
         result.positions = this.positions;
         result.width = this.width;
         result.followSurface = this.followSurface;
@@ -190,7 +177,6 @@ define([
 
         this.show = defaultValue(this.show, source.show);
         this.material = defaultValue(this.material, source.material);
-        this.depthFailMaterial = defaultValue(this.depthFailMaterial, source.depthFailMaterial);
         this.positions = defaultValue(this.positions, source.positions);
         this.width = defaultValue(this.width, source.width);
         this.followSurface = defaultValue(this.followSurface, source.followSurface);

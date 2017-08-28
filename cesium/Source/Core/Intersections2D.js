@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './Cartesian3',
         './defined',
@@ -274,8 +275,9 @@ define([
             result.y = l2;
             result.z = l3;
             return result;
+        } else {
+            return new Cartesian3(l1, l2, l3);
         }
-        return new Cartesian3(l1, l2, l3);
     };
 
     return Intersections2D;

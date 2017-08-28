@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/arrayRemoveDuplicates',
         '../Core/BoundingSphere',
@@ -88,7 +89,7 @@ define([
 
         this._actualLength = undefined;
 
-        this._propertiesChanged = new Uint32Array(NUMBER_OF_PROPERTIES); //eslint-disable-line no-use-before-define
+        this._propertiesChanged = new Uint32Array(NUMBER_OF_PROPERTIES);
         this._polylineCollection = polylineCollection;
         this._dirty = false;
         this._pickId = undefined;
@@ -259,11 +260,13 @@ define([
                             }
                             positions.push(Cartesian3.clone(positions[0]));
                         }
-                    } else if (positions.length > 2 && Cartesian3.equals(positions[0], positions[positions.length - 1])) {
-                        if (positions.length - 1 === this._positions.length) {
-                            this._actualPositions = this._positions;
-                        } else {
-                            positions.pop();
+                    } else {
+                        if (positions.length > 2 && Cartesian3.equals(positions[0], positions[positions.length - 1])) {
+                            if (positions.length - 1 === this._positions.length) {
+                                this._actualPositions = this._positions;
+                            } else {
+                                positions.pop();
+                            }
                         }
                     }
 
@@ -332,7 +335,7 @@ define([
             this._boundingVolumeWC = BoundingSphere.transform(this._boundingVolume, modelMatrix, this._boundingVolumeWC);
         }
 
-        this._modelMatrix = Matrix4.clone(modelMatrix, this._modelMatrix);
+        this._modelMatrix = modelMatrix;
 
         if (this._segments.positions.length !== segmentPositionsLength) {
             // number of positions changed

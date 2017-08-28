@@ -1,27 +1,15 @@
+/*global define*/
 define([
         '../ThirdParty/when',
-        './defined',
-        './isDataUri',
         './loadBlob',
         './loadImage'
     ], function(
         when,
-        defined,
-        isDataUri,
         loadBlob,
         loadImage) {
     'use strict';
 
-    var xhrBlobSupported = (function() {
-        try {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '#', true);
-            xhr.responseType = 'blob';
-            return xhr.responseType === 'blob';
-        } catch (e) {
-            return false;
-        }
-    })();
+    var dataUriRegex = /^data:/;
 
     /**
      * Asynchronously loads the given image URL by first downloading it as a blob using
@@ -37,9 +25,8 @@ define([
      *
      * @exports loadImageViaBlob
      *
-     * @param {String} url The source URL of the image.
-     * @param {Request} [request] The request object. Intended for internal use only.
-     * @returns {Promise.<Image>|undefined} a promise that will resolve to the requested data when loaded. Returns undefined if <code>request.throttle</code> is true and the request does not have high enough priority.
+     * @param {String|Promise.<String>} url The source of the image, or a promise for the URL.
+     * @returns {Promise.<Image>} a promise that will resolve to the requested data when loaded.
      *
      *
      * @example
@@ -55,21 +42,16 @@ define([
      * when.all([loadImageViaBlob('image1.png'), loadImageViaBlob('image2.png')]).then(function(images) {
      *     // images is an array containing all the loaded images
      * });
-     *
+     * 
      * @see {@link http://www.w3.org/TR/cors/|Cross-Origin Resource Sharing}
      * @see {@link http://wiki.commonjs.org/wiki/Promises/A|CommonJS Promises/A}
      */
-    function loadImageViaBlob(url, request) {
-        if (!xhrBlobSupported || isDataUri(url)) {
-            return loadImage(url, undefined, request);
+    function loadImageViaBlob(url) {
+        if (dataUriRegex.test(url)) {
+            return loadImage(url);
         }
 
-        var blobPromise = loadBlob(url, undefined, request);
-        if (!defined(blobPromise)) {
-            return undefined;
-        }
-
-        return blobPromise.then(function(blob) {
+        return loadBlob(url).then(function(blob) {
             var blobUrl = window.URL.createObjectURL(blob);
 
             return loadImage(blobUrl, false).then(function(image) {
@@ -83,5 +65,16 @@ define([
         });
     }
 
-    return loadImageViaBlob;
+    var xhrBlobSupported = (function() {
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '#', true);
+            xhr.responseType = 'blob';
+            return xhr.responseType === 'blob';
+        } catch (e) {
+            return false;
+        }
+    })();
+
+    return xhrBlobSupported ? loadImageViaBlob : loadImage;
 });

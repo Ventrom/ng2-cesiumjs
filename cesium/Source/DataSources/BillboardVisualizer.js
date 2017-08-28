@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/AssociativeArray',
         '../Core/BoundingRectangle',
@@ -42,7 +43,6 @@ define([
     var defaultHorizontalOrigin = HorizontalOrigin.CENTER;
     var defaultVerticalOrigin = VerticalOrigin.CENTER;
     var defaultSizeInMeters = false;
-    var defaultDisableDepthTestDistance = 0.0;
 
     var position = new Cartesian3();
     var color = new Color();
@@ -154,9 +154,8 @@ define([
             billboard.scaleByDistance = Property.getValueOrUndefined(billboardGraphics._scaleByDistance, time, scaleByDistance);
             billboard.translucencyByDistance = Property.getValueOrUndefined(billboardGraphics._translucencyByDistance, time, translucencyByDistance);
             billboard.pixelOffsetScaleByDistance = Property.getValueOrUndefined(billboardGraphics._pixelOffsetScaleByDistance, time, pixelOffsetScaleByDistance);
-            billboard.sizeInMeters = Property.getValueOrDefault(billboardGraphics._sizeInMeters, time, defaultSizeInMeters);
+            billboard.sizeInMeters = Property.getValueOrDefault(billboardGraphics._sizeInMeters, defaultSizeInMeters);
             billboard.distanceDisplayCondition = Property.getValueOrUndefined(billboardGraphics._distanceDisplayCondition, time, distanceDisplayCondition);
-            billboard.disableDepthTestDistance = Property.getValueOrDefault(billboardGraphics._disableDepthTestDistance, time, defaultDisableDepthTestDistance);
 
             var subRegion = Property.getValueOrUndefined(billboardGraphics._imageSubRegion, time, boundingRectangle);
             if (defined(subRegion)) {

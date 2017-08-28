@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './defaultValue',
         './defined',
@@ -52,7 +53,7 @@ define([
      *   },
      *   id : 'top'
      * });
-     *
+     * 
      * @see Geometry
      */
     function GeometryInstance(options) {

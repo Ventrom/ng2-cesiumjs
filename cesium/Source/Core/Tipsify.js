@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './defaultValue',
         './defined',
@@ -218,8 +219,7 @@ define([
 
         // Vertices
         var vertices = [];
-        var i;
-        for (i = 0; i < maximumIndexPlusOne; i++) {
+        for ( var i = 0; i < maximumIndexPlusOne; i++) {
             vertices[i] = {
                 numLiveTriangles : 0,
                 timeStamp : 0,

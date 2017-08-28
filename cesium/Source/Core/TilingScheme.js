@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './defineProperties',
         './DeveloperError'
@@ -74,7 +75,7 @@ define([
     TilingScheme.prototype.getNumberOfYTilesAtLevel = DeveloperError.throwInstantiationError;
 
     /**
-     * Transforms a rectangle specified in geodetic radians to the native coordinate system
+     * Transforms an rectangle specified in geodetic radians to the native coordinate system
      * of this tiling scheme.
      * @function
      *
@@ -87,7 +88,7 @@ define([
     TilingScheme.prototype.rectangleToNativeRectangle = DeveloperError.throwInstantiationError;
 
     /**
-     * Converts tile x, y coordinates and level to a rectangle expressed in the native coordinates
+     * Converts tile x, y coordinates and level to an rectangle expressed in the native coordinates
      * of the tiling scheme.
      * @function
      *

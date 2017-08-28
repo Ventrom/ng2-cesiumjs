@@ -1,9 +1,10 @@
+/*global define*/
 define([
-        './Check',
-        './defined'
+        './defined',
+        './DeveloperError'
     ], function(
-        Check,
-        defined) {
+        defined,
+        DeveloperError) {
     'use strict';
 
     /**
@@ -30,9 +31,15 @@ define([
      */
     function binarySearch(array, itemToFind, comparator) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('array', array);
-        Check.defined('itemToFind', itemToFind);
-        Check.defined('comparator', comparator);
+        if (!defined(array)) {
+            throw new DeveloperError('array is required.');
+        }
+        if (!defined(itemToFind)) {
+            throw new DeveloperError('itemToFind is required.');
+        }
+        if (!defined(comparator)) {
+            throw new DeveloperError('comparator is required.');
+        }
         //>>includeEnd('debug');
 
         var low = 0;

@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defaultValue',
         '../Renderer/Pass'

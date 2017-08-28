@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './loadWithXhr'
     ], function(
@@ -12,10 +13,10 @@ define([
      *
      * @exports loadBlob
      *
-     * @param {String} url The URL of the data.
+     * @param {String|Promise.<String>} url The URL of the data, or a promise for the URL.
      * @param {Object} [headers] HTTP headers to send with the requests.
-     * @param {Request} [request] The request object. Intended for internal use only.
-     * @returns {Promise.<Blob>|undefined} a promise that will resolve to the requested data when loaded. Returns undefined if <code>request.throttle</code> is true and the request does not have high enough priority.
+     * @returns {Promise.<Blob>} a promise that will resolve to the requested data when loaded.
+     *
      *
      * @example
      * // load a single URL asynchronously
@@ -24,16 +25,15 @@ define([
      * }).otherwise(function(error) {
      *     // an error occurred
      * });
-     *
+     * 
      * @see {@link http://www.w3.org/TR/cors/|Cross-Origin Resource Sharing}
      * @see {@link http://wiki.commonjs.org/wiki/Promises/A|CommonJS Promises/A}
      */
-    function loadBlob(url, headers, request) {
+    function loadBlob(url, headers) {
         return loadWithXhr({
             url : url,
             responseType : 'blob',
-            headers : headers,
-            request : request
+            headers : headers
         });
     }
 

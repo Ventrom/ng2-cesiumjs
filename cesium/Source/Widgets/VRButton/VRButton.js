@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../../Core/defined',
         '../../Core/defineProperties',
@@ -52,7 +53,6 @@ define([
         element.type = 'button';
         element.className = 'cesium-button cesium-vrButton';
         element.setAttribute('data-bind', '\
-css: { "cesium-button-disabled" : _isOrthographic }, \
 attr: { title: tooltip },\
 click: command,\
 enable: isVREnabled,\

@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../../Core/defined',
         '../../Core/defineProperties',
@@ -24,6 +25,9 @@ define([
      *
      * @param {Element|String} container The DOM element or ID that will contain the widget.
      * @param {Scene} scene The Scene instance to use.
+     *
+     * @exception {DeveloperError} container is required.
+     * @exception {DeveloperError} scene is required.
      *
      * @demo {@link http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html?src=Cesium%20Inspector.html|Cesium Sandcastle Cesium Inspector Demo}
      */
@@ -79,15 +83,15 @@ define([
 
         var debugShowFrustums = document.createElement('div');
         generalSection.appendChild(debugShowFrustums);
-        var frustumStatistics = document.createElement('div');
-        frustumStatistics.className = 'cesium-cesiumInspector-frustumStatistics';
-        frustumStatistics.setAttribute('data-bind', 'css: {"cesium-cesiumInspector-show" : frustums, "cesium-cesiumInspector-hide" :  !frustums}, html: frustumStatisticText');
+        var frustumStats = document.createElement('div');
+        frustumStats.className = 'cesium-cesiumInspector-frustumStats';
+        frustumStats.setAttribute('data-bind', 'css: {"cesium-cesiumInspector-show" : frustums, "cesium-cesiumInspector-hide" :  !frustums}, html: frustumStatisticText');
         var frustumsCheckbox = document.createElement('input');
         frustumsCheckbox.type = 'checkbox';
         frustumsCheckbox.setAttribute('data-bind', 'checked: frustums');
         debugShowFrustums.appendChild(frustumsCheckbox);
         debugShowFrustums.appendChild(document.createTextNode('Show Frustums'));
-        debugShowFrustums.appendChild(frustumStatistics);
+        debugShowFrustums.appendChild(frustumStats);
 
         var debugShowFrustumPlanes = document.createElement('div');
         generalSection.appendChild(debugShowFrustumPlanes);
@@ -267,7 +271,7 @@ define([
 
         var tileText = document.createElement('div');
         tileText.className = 'cesium-cesiumInspector-tileText';
-        tileInfo.className = 'cesium-cesiumInspector-frustumStatistics';
+        tileInfo.className = 'cesium-cesiumInspector-frustumStats';
         tileInfo.appendChild(tileText);
         tileInfo.setAttribute('data-bind', 'css: {"cesium-cesiumInspector-show" : hasPickedTile, "cesium-cesiumInspector-hide" :  !hasPickedTile}');
         tileText.setAttribute('data-bind', 'html: tileText');

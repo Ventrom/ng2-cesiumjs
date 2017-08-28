@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../../Core/ClockRange',
         '../../Core/defined',

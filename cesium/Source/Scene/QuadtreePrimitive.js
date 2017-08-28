@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/Cartesian3',
         '../Core/Cartographic',
@@ -8,7 +9,6 @@ define([
         '../Core/Event',
         '../Core/getTimestamp',
         '../Core/Math',
-        '../Core/OrthographicFrustum',
         '../Core/Ray',
         '../Core/Rectangle',
         '../Core/Visibility',
@@ -27,7 +27,6 @@ define([
         Event,
         getTimestamp,
         CesiumMath,
-        OrthographicFrustum,
         Ray,
         Rectangle,
         Visibility,
@@ -99,6 +98,7 @@ define([
         this._tileLoadQueueLow = []; // low priority tiles were refined past or are non-visible parts of quads.
         this._tileReplacementQueue = new TileReplacementQueue();
         this._levelZeroTiles = undefined;
+        this._levelZeroTilesReady = false;
         this._loadQueueTimeSlice = 5.0;
 
         this._addHeightCallbacks = [];
@@ -494,13 +494,7 @@ define([
             }
         }
 
-        frameState.afterRender.push(createTileProgressFunction(primitive));
-    }
-
-    function createTileProgressFunction(primitive) {
-        return function() {
-            raiseTileLoadProgressEvent(primitive);
-        };
+        raiseTileLoadProgressEvent(primitive);
     }
 
     function visitTile(primitive, frameState, tile) {
@@ -586,18 +580,20 @@ define([
                 queueChildTileLoad(primitive, northeast);
                 queueChildTileLoad(primitive, southeast);
             }
-        } else if (cameraPosition.latitude < southwest.north) {
-            // Camera southeast quadrant
-            queueChildTileLoad(primitive, southeast);
-            queueChildTileLoad(primitive, southwest);
-            queueChildTileLoad(primitive, northeast);
-            queueChildTileLoad(primitive, northwest);
         } else {
-            // Camera in northeast quadrant
-            queueChildTileLoad(primitive, northeast);
-            queueChildTileLoad(primitive, northwest);
-            queueChildTileLoad(primitive, southeast);
-            queueChildTileLoad(primitive, southwest);
+            if (cameraPosition.latitude < southwest.north) {
+                // Camera southeast quadrant
+                queueChildTileLoad(primitive, southeast);
+                queueChildTileLoad(primitive, southwest);
+                queueChildTileLoad(primitive, northeast);
+                queueChildTileLoad(primitive, northwest);
+            } else {
+                // Camera in northeast quadrant
+                queueChildTileLoad(primitive, northeast);
+                queueChildTileLoad(primitive, northwest);
+                queueChildTileLoad(primitive, southeast);
+                queueChildTileLoad(primitive, southwest);
+            }
         }
     }
 
@@ -632,18 +628,20 @@ define([
                 visitIfVisible(primitive, northeast, tileProvider, frameState, occluders);
                 visitIfVisible(primitive, southeast, tileProvider, frameState, occluders);
             }
-        } else if (cameraPosition.latitude < southwest.rectangle.north) {
-            // Camera southeast quadrant
-            visitIfVisible(primitive, southeast, tileProvider, frameState, occluders);
-            visitIfVisible(primitive, southwest, tileProvider, frameState, occluders);
-            visitIfVisible(primitive, northeast, tileProvider, frameState, occluders);
-            visitIfVisible(primitive, northwest, tileProvider, frameState, occluders);
         } else {
-            // Camera in northeast quadrant
-            visitIfVisible(primitive, northeast, tileProvider, frameState, occluders);
-            visitIfVisible(primitive, northwest, tileProvider, frameState, occluders);
-            visitIfVisible(primitive, southeast, tileProvider, frameState, occluders);
-            visitIfVisible(primitive, southwest, tileProvider, frameState, occluders);
+            if (cameraPosition.latitude < southwest.rectangle.north) {
+                // Camera southeast quadrant
+                visitIfVisible(primitive, southeast, tileProvider, frameState, occluders);
+                visitIfVisible(primitive, southwest, tileProvider, frameState, occluders);
+                visitIfVisible(primitive, northeast, tileProvider, frameState, occluders);
+                visitIfVisible(primitive, northwest, tileProvider, frameState, occluders);
+            } else {
+                // Camera in northeast quadrant
+                visitIfVisible(primitive, northeast, tileProvider, frameState, occluders);
+                visitIfVisible(primitive, northwest, tileProvider, frameState, occluders);
+                visitIfVisible(primitive, southeast, tileProvider, frameState, occluders);
+                visitIfVisible(primitive, southwest, tileProvider, frameState, occluders);
+            }
         }
     }
 
@@ -669,7 +667,7 @@ define([
     }
 
     function screenSpaceError(primitive, frameState, tile) {
-        if (frameState.mode === SceneMode.SCENE2D || frameState.camera.frustum instanceof OrthographicFrustum) {
+        if (frameState.mode === SceneMode.SCENE2D) {
             return screenSpaceError2D(primitive, frameState, tile);
         }
 
@@ -691,9 +689,6 @@ define([
     function screenSpaceError2D(primitive, frameState, tile) {
         var camera = frameState.camera;
         var frustum = camera.frustum;
-        if (defined(frustum._offCenterFrustum)) {
-            frustum = frustum._offCenterFrustum;
-        }
 
         var context = frameState.context;
         var width = context.drawingBufferWidth;
@@ -701,13 +696,7 @@ define([
 
         var maxGeometricError = primitive._tileProvider.getLevelMaximumGeometricError(tile.level);
         var pixelSize = Math.max(frustum.top - frustum.bottom, frustum.right - frustum.left) / Math.max(width, height);
-        var error = maxGeometricError / pixelSize;
-
-        if (frameState.fog.enabled && frameState.mode !== SceneMode.SCENE2D) {
-            error = error - CesiumMath.fog(tile._distance, frameState.fog.density) * frameState.fog.sse;
-        }
-
-        return error;
+        return maxGeometricError / pixelSize;
     }
 
     function addTileToRenderList(primitive, tile) {
@@ -766,8 +755,7 @@ define([
             var customDataLength = customData.length;
 
             var timeSliceMax = false;
-            var i;
-            for (i = primitive._lastTileIndex; i < customDataLength; ++i) {
+            for (var i = primitive._lastTileIndex; i < customDataLength; ++i) {
                 var data = customData[i];
 
                 if (tile.level > data.level) {

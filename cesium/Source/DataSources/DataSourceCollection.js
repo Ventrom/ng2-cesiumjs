@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defaultValue',
         '../Core/defined',
@@ -204,7 +205,7 @@ define([
      *
      * @example
      * dataSourceCollection = dataSourceCollection && dataSourceCollection.destroy();
-     *
+     * 
      * @see DataSourceCollection#isDestroyed
      */
     DataSourceCollection.prototype.destroy = function() {

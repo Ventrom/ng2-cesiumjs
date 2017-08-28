@@ -1,19 +1,20 @@
+/*global define*/
 define([
-        './BingMapsApi',
-        './Check',
-        './defaultValue',
-        './defined',
-        './defineProperties',
-        './loadJsonp',
-        './Rectangle'
-    ], function(
-        BingMapsApi,
-        Check,
-        defaultValue,
-        defined,
-        defineProperties,
-        loadJsonp,
-        Rectangle) {
+    './BingMapsApi',
+    './defaultValue',
+    './defined',
+    './defineProperties',
+    './DeveloperError',
+    './loadJsonp',
+    './Rectangle'
+], function(
+    BingMapsApi,
+    defaultValue,
+    defined,
+    defineProperties,
+    DeveloperError,
+    loadJsonp,
+    Rectangle) {
     'use strict';
 
     var url = 'https://dev.virtualearth.net/REST/v1/Locations';
@@ -24,13 +25,15 @@ define([
      * @constructor
      *
      * @param {Object} options Object with the following properties:
-     * @param {Scene} options.scene The scene
+     * @param {String} options.scene The scene
      * @param {String} [options.key] A key to use with the Bing Maps geocoding service
      */
     function BingMapsGeocoderService(options) {
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('options.scene', options.scene);
+        if (!defined(options.scene)) {
+            throw new DeveloperError('options.scene is required.');
+        }
         //>>includeEnd('debug');
 
         var key = options.key;
@@ -78,7 +81,9 @@ define([
      */
     BingMapsGeocoderService.prototype.geocode = function(query) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.string('query', query);
+        if (!defined(query)) {
+            throw new DeveloperError('query must be defined');
+        }
         //>>includeEnd('debug');
 
         var key = this.key;

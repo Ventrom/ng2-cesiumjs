@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defaultValue',
         '../Core/defined',
@@ -33,20 +34,21 @@ define([
         display.className = 'cesium-performanceDisplay';
         var fpsElement = document.createElement('div');
         fpsElement.className = 'cesium-performanceDisplay-fps';
-        this._fpsText = document.createTextNode('');
+        this._fpsText = document.createTextNode("");
         fpsElement.appendChild(this._fpsText);
         var msElement = document.createElement('div');
         msElement.className = 'cesium-performanceDisplay-ms';
-        this._msText = document.createTextNode('');
+        this._msText = document.createTextNode("");
         msElement.appendChild(this._msText);
         display.appendChild(msElement);
         display.appendChild(fpsElement);
         this._container.appendChild(display);
 
-        this._lastFpsSampleTime = getTimestamp();
-        this._lastMsSampleTime = getTimestamp();
-        this._fpsFrameCount = 0;
-        this._msFrameCount = 0;
+        this._lastFpsSampleTime = undefined;
+        this._frameCount = 0;
+        this._time = undefined;
+        this._fps = 0;
+        this._frameTime = 0;
     }
 
     /**
@@ -54,24 +56,39 @@ define([
      * each call records a frame in the internal buffer and redraws the display.
      */
     PerformanceDisplay.prototype.update = function() {
-        var time = getTimestamp();
+        if (!defined(this._time)) {
+            //first update
+            this._lastFpsSampleTime = getTimestamp();
+            this._time = getTimestamp();
+            return;
+        }
 
-        this._fpsFrameCount++;
+        var previousTime = this._time;
+        var time = getTimestamp();
+        this._time = time;
+
+        var frameTime = time - previousTime;
+
+        this._frameCount++;
+        var fps = this._fps;
         var fpsElapsedTime = time - this._lastFpsSampleTime;
         if (fpsElapsedTime > 1000) {
-            var fps = this._fpsFrameCount * 1000 / fpsElapsedTime | 0;
-            this._fpsText.nodeValue = fps + ' FPS';
+            fps = this._frameCount * 1000 / fpsElapsedTime | 0;
+
             this._lastFpsSampleTime = time;
-            this._fpsFrameCount = 0;
+            this._frameCount = 0;
         }
 
-        this._msFrameCount++;
-        var msElapsedTime = time - this._lastMsSampleTime;
-        if (msElapsedTime > 200) {
-            this._msText.nodeValue = (msElapsedTime / this._msFrameCount).toFixed(2) + ' MS';
-            this._lastMsSampleTime = time;
-            this._msFrameCount = 0;
+        if (fps !== this._fps) {
+            this._fpsText.nodeValue = fps + ' FPS';
+            this._fps = fps;
         }
+
+        if (frameTime !== this._frameTime) {
+            this._msText.nodeValue = frameTime.toFixed(2) + ' MS';
+            this._frameTime = frameTime;
+        }
+
     };
 
     /**

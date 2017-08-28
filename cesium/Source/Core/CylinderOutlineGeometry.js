@@ -1,13 +1,14 @@
 
+/*global define*/
 define([
         './BoundingSphere',
         './Cartesian2',
         './Cartesian3',
-        './Check',
         './ComponentDatatype',
         './CylinderGeometryLibrary',
         './defaultValue',
         './defined',
+        './DeveloperError',
         './Geometry',
         './GeometryAttribute',
         './GeometryAttributes',
@@ -17,11 +18,11 @@ define([
         BoundingSphere,
         Cartesian2,
         Cartesian3,
-        Check,
         ComponentDatatype,
         CylinderGeometryLibrary,
         defaultValue,
         defined,
+        DeveloperError,
         Geometry,
         GeometryAttribute,
         GeometryAttributes,
@@ -71,10 +72,18 @@ define([
         var numberOfVerticalLines = Math.max(defaultValue(options.numberOfVerticalLines, 16), 0);
 
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.number('options.positions', length);
-        Check.typeOf.number('options.topRadius', topRadius);
-        Check.typeOf.number('options.bottomRadius', bottomRadius);
-        Check.typeOf.number.greaterThanOrEquals('options.slices', slices, 3);
+        if (!defined(length)) {
+            throw new DeveloperError('options.length must be defined.');
+        }
+        if (!defined(topRadius)) {
+            throw new DeveloperError('options.topRadius must be defined.');
+        }
+        if (!defined(bottomRadius)) {
+            throw new DeveloperError('options.bottomRadius must be defined.');
+        }
+        if (slices < 3) {
+            throw new DeveloperError('options.slices must be greater than or equal to 3.');
+        }
         //>>includeEnd('debug');
 
         this._length = length;
@@ -102,8 +111,12 @@ define([
      */
     CylinderOutlineGeometry.pack = function(value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('value', value);
-        Check.defined('array', array);
+        if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
         //>>includeEnd('debug');
 
         startingIndex = defaultValue(startingIndex, 0);
@@ -135,7 +148,9 @@ define([
      */
     CylinderOutlineGeometry.unpack = function(array, startingIndex, result) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('array', array);
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
         //>>includeEnd('debug');
 
         startingIndex = defaultValue(startingIndex, 0);
@@ -194,8 +209,7 @@ define([
 
         var indices = IndexDatatype.createTypedArray(numVertices, numIndices * 2);
         var index = 0;
-        var i;
-        for (i = 0; i < slices - 1; i++) {
+        for (var i = 0; i < slices - 1; i++) {
             indices[index++] = i;
             indices[index++] = i + 1;
             indices[index++] = i + slices;

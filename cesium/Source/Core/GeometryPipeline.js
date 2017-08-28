@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './AttributeCompression',
         './barycentricCoordinates',
@@ -383,8 +384,8 @@ define([
                     while (intoElementsIn < numVertices) {
                         var temp = indexCrossReferenceOldToNew[intoElementsIn];
                         if (temp !== -1) {
-                            for (var j = 0; j < numComponents; j++) {
-                                elementsOut[numComponents * temp + j] = elementsIn[numComponents * intoElementsIn + j];
+                            for (i = 0; i < numComponents; i++) {
+                                elementsOut[numComponents * temp + i] = elementsIn[numComponents * intoElementsIn + i];
                             }
                         }
                         ++intoElementsIn;
@@ -1101,8 +1102,8 @@ define([
         var normalsPerVertex = new Array(numVertices);
         var normalsPerTriangle = new Array(numIndices / 3);
         var normalIndices = new Array(numIndices);
-        var i;
-        for ( i = 0; i < numVertices; i++) {
+
+        for ( var i = 0; i < numVertices; i++) {
             normalsPerVertex[i] = {
                 indexOffset : 0,
                 count : 0,
@@ -1264,8 +1265,7 @@ define([
         var numIndices = indices.length;
         var tan1 = new Array(numVertices * 3);
 
-        var i;
-        for ( i = 0; i < tan1.length; i++) {
+        for ( var i = 0; i < tan1.length; i++) {
             tan1[i] = 0;
         }
 

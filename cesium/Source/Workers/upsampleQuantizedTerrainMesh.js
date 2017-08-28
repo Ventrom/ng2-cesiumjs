@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/AttributeCompression',
         '../Core/BoundingSphere',

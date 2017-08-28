@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../Core/defaultValue',
         '../Core/defined',
@@ -219,7 +220,7 @@ define([
 
         /**
          * Gets or sets the {@link DistanceDisplayCondition} Property specifying at what distance from the camera that this polygon will be displayed.
-         * @memberof PolygonGraphics.prototype
+         * @memberof BillboardGraphics.prototype
          * @type {Property}
          */
         distanceDisplayCondition : createPropertyDescriptor('distanceDisplayCondition')

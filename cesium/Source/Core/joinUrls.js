@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../ThirdParty/Uri',
         './defaultValue',
@@ -17,8 +18,6 @@ define([
      * @param {String|Uri} first The base URL.
      * @param {String|Uri} second The URL path to join to the base URL.  If this URL is absolute, it is returned unmodified.
      * @param {Boolean} [appendSlash=true] The boolean determining whether there should be a forward slash between first and second.
-     *
-     * @return {String} The combined url
      * @private
      */
     function joinUrls(first, second, appendSlash) {
@@ -39,16 +38,6 @@ define([
 
         if (!(second instanceof Uri)) {
             second = new Uri(second);
-        }
-
-        // Don't try to join a data uri
-        if (first.scheme === 'data') {
-            return first.toString();
-        }
-
-        // Don't try to join a data uri
-        if (second.scheme === 'data') {
-            return second.toString();
         }
 
         // Uri.isAbsolute returns false for a URL like '//foo.com'.  So if we have an authority but
@@ -77,7 +66,7 @@ define([
 
             if (baseUri.path !== '' && baseUri.path !== '/') {
                 url = url.replace(/\/?$/, '/');
-				if (baseUri.scheme !== "file") baseUri.path = baseUri.path.replace(/^\/?/g, '');
+                if (baseUri.scheme !== "file") baseUri.path = baseUri.path.replace(/^\/?/g, '');
             }
         }
 

@@ -1,3 +1,4 @@
+/*global define*/
 define([
         '../../Core/defined',
         '../../Core/defineProperties',
@@ -26,11 +27,11 @@ define([
         createCommand) {
     'use strict';
 
-    function frustumStatisticsToString(statistics) {
+    function frustumStatsToString(stats) {
         var str;
-        if (defined(statistics)) {
+        if (defined(stats)) {
             str = 'Command Statistics';
-            var com = statistics.commandsInFrustums;
+            var com = stats.commandsInFrustums;
             for (var n in com) {
                 if (com.hasOwnProperty(n)) {
                     var num = parseInt(n, 10);
@@ -51,7 +52,7 @@ define([
                     str += '<br>&nbsp;&nbsp;&nbsp;&nbsp;' + com[n] + ' in frustum ' + s;
                 }
             }
-            str += '<br>Total: ' + statistics.totalCommands;
+            str += '<br>Total: ' + stats.totalCommands;
         }
 
         return str;
@@ -70,6 +71,8 @@ define([
      *
      * @param {Scene} scene The scene instance to use.
      * @param {PerformanceContainer} performanceContainer The instance to use for performance container.
+     *
+     * @exception {DeveloperError} scene is required.
      */
     function CesiumInspectorViewModel(scene, performanceContainer) {
         //>>includeStart('debug', pragmas.debug);
@@ -490,7 +493,7 @@ define([
 
                 globe._surface._tilesToRender = [];
 
-                if (defined(that._tile) && that._tile.renderable) {
+                if (defined(that._tile)) {
                     globe._surface._tilesToRender.push(that._tile);
                 }
             }
@@ -566,10 +569,6 @@ define([
             } else {
                 eventHandler.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
             }
-        });
-
-        this._removePostRenderEvent = scene.postRender.addEventListener(function() {
-            that._update();
         });
     }
 
@@ -851,9 +850,6 @@ define([
          * @type {Command}
          */
         primitive : {
-            get : function() {
-                return this._primitive;
-            },
             set : function(newPrimitive) {
                 var oldPrimitive = this._primitive;
                 if (newPrimitive !== oldPrimitive) {
@@ -875,6 +871,10 @@ define([
                     this.showPrimitiveReferenceFrame();
                     this.doFilterPrimitive();
                 }
+            },
+
+            get : function() {
+                return this._primitive;
             }
         },
 
@@ -885,9 +885,6 @@ define([
          * @type {Command}
          */
         tile : {
-            get : function() {
-                return this._tile;
-            },
             set : function(newTile) {
                 if (defined(newTile)) {
                     this.hasPickedTile = true;
@@ -896,12 +893,7 @@ define([
                         this.tileText = 'L: ' + newTile.level + ' X: ' + newTile.x + ' Y: ' + newTile.y;
                         this.tileText += '<br>SW corner: ' + newTile.rectangle.west + ', ' + newTile.rectangle.south;
                         this.tileText += '<br>NE corner: ' + newTile.rectangle.east + ', ' + newTile.rectangle.north;
-                        var data = newTile.data;
-                        if (defined(data)) {
-                            this.tileText += '<br>Min: ' + data.minimumHeight + ' Max: ' + data.maximumHeight;
-                        } else {
-                            this.tileText += '<br>(Tile is not loaded)';
-                        }
+                        this.tileText += '<br>Min: ' + newTile.data.minimumHeight + ' Max: ' + newTile.data.maximumHeight;
                     }
                     this._tile = newTile;
                     this.showTileBoundingSphere();
@@ -910,36 +902,41 @@ define([
                     this.hasPickedTile = false;
                     this._tile = undefined;
                 }
+            },
+
+            get : function() {
+                return this._tile;
+            }
+        },
+
+        update : {
+            get : function() {
+                var that = this;
+                return function() {
+                    if (that.frustums) {
+                        that.frustumStatisticText = frustumStatsToString(that._scene.debugFrustumStatistics);
+                    }
+
+                    // Determine the number of frustums being used.
+                    var numberOfFrustums = that._scene.numberOfFrustums;
+                    that._numberOfFrustums = numberOfFrustums;
+                    // Bound the frustum to be displayed.
+                    that.depthFrustum = boundDepthFrustum(1, numberOfFrustums, that.depthFrustum);
+                    // Update the displayed text.
+                    that.depthFrustumText = that.depthFrustum + ' of ' + numberOfFrustums;
+
+                    if (that.performance) {
+                        that._performanceDisplay.update();
+                    }
+                    if (that.primitiveReferenceFrame) {
+                        that._modelMatrixPrimitive.modelMatrix = that._primitive.modelMatrix;
+                    }
+
+                    that.shaderCacheText = 'Cached shaders: ' + that._scene.context.shaderCache.numberOfShaders;
+                };
             }
         }
     });
-
-    /**
-     * Updates the view model
-     * @private
-     */
-    CesiumInspectorViewModel.prototype._update = function() {
-        if (this.frustums) {
-            this.frustumStatisticText = frustumStatisticsToString(this._scene.debugFrustumStatistics);
-        }
-
-        // Determine the number of frustums being used.
-        var numberOfFrustums = this._scene.numberOfFrustums;
-        this._numberOfFrustums = numberOfFrustums;
-        // Bound the frustum to be displayed.
-        this.depthFrustum = boundDepthFrustum(1, numberOfFrustums, this.depthFrustum);
-        // Update the displayed text.
-        this.depthFrustumText = this.depthFrustum + ' of ' + numberOfFrustums;
-
-        if (this.performance) {
-            this._performanceDisplay.update();
-        }
-        if (this.primitiveReferenceFrame) {
-            this._modelMatrixPrimitive.modelMatrix = this._primitive.modelMatrix;
-        }
-
-        this.shaderCacheText = 'Cached shaders: ' + this._scene.context.shaderCache.numberOfShaders;
-    };
 
     /**
      * @returns {Boolean} true if the object has been destroyed, false otherwise.
@@ -954,7 +951,6 @@ define([
      */
     CesiumInspectorViewModel.prototype.destroy = function() {
         this._eventHandler.destroy();
-        this._removePostRenderEvent();
         this._frustumsSubscription.dispose();
         this._frustumPlanesSubscription.dispose();
         this._performanceSubscription.dispose();

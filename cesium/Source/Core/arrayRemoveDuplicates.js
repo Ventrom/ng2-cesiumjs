@@ -1,12 +1,13 @@
+/*global define*/
 define([
-        './Check',
         './defaultValue',
         './defined',
+        './DeveloperError',
         './Math'
     ], function(
-        Check,
         defaultValue,
         defined,
+        DeveloperError,
         CesiumMath) {
     'use strict';
 
@@ -44,7 +45,9 @@ define([
      */
     function arrayRemoveDuplicates(values, equalsEpsilon, wrapAround) {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('equalsEpsilon', equalsEpsilon);
+        if (!defined(equalsEpsilon)) {
+            throw new DeveloperError('equalsEpsilon is required.');
+        }
         //>>includeEnd('debug');
 
         if (!defined(values)) {

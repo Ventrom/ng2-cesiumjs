@@ -1,3 +1,4 @@
+/*global define*/
 define([
         './AssociativeArray',
         './Cartesian2',
@@ -786,7 +787,6 @@ define([
     /**
      * The amount of time, in milliseconds, that mouse events will be disabled after
      * receiving any touch events, such that any emulated mouse events will be ignored.
-     * @type {Number}
      * @default 800
      */
     ScreenSpaceEventHandler.mouseEmulationIgnoreMilliseconds = 800;
