@@ -5,11 +5,7 @@ declare var require: any
 var BuildModuleUrl: any = require('ng2-cesiumjs/cesium/Source/Core/buildModuleUrl')
 BuildModuleUrl.setBaseUrl('./cesium/')
 
-const CesiumTerrainProvider: any = require('ng2-cesiumjs/cesium/Source/Core/CesiumTerrainProvider')
-const Viewer: any = require('ng2-cesiumjs/cesium/Source/Widgets/Viewer/Viewer')
-const UrlTemplateImageryProvider: any = require('ng2-cesiumjs/cesium/Source/Scene/UrlTemplateImageryProvider')
-const Rectangle: any = require('ng2-cesiumjs/cesium/Source/Core/Rectangle')
-const GeographicTilingScheme: any = require('ng2-cesiumjs/cesium/Source/Core/GeographicTilingScheme')
+const Cesium: any = require('Cesium')
 
 @Component({
     selector: 'billboard',
@@ -36,7 +32,7 @@ export class BillboardComponent implements AfterViewInit {
     ) {}
 
     ngAfterViewInit() {
-        this.terrainProvider = new CesiumTerrainProvider({
+        this.terrainProvider = new Cesium.CesiumTerrainProvider({
             url : this.ctpUrl,
             requestVertexNormals : true,
             requestWaterMask: true
@@ -47,14 +43,13 @@ export class BillboardComponent implements AfterViewInit {
         Promise.all([cesiumPromise]).then(values => {
             console.log(values)
             if (values) {
-                console.log(values);
-                self.viewer = new Viewer(self.container.nativeElement, {
+                self.viewer = new Cesium.Viewer(self.container.nativeElement, {
                     // Access the US imagery, which uses a TMS tiling scheme and Geographic (EPSG:4326) project
-                    imageryProvider : new UrlTemplateImageryProvider({
+                    imageryProvider : new Cesium.UrlTemplateImageryProvider({
                         url : this.utipUrl,
                         maximumLevel : 6,
-                        rectangle : Rectangle.fromDegrees(-130.58, 21.12, -62.65, 52.40),
-                        tilingScheme : new GeographicTilingScheme()
+                        rectangle : Cesium.Rectangle.fromDegrees(-130.58, 21.12, -62.65, 52.40),
+                        tilingScheme : new Cesium.GeographicTilingScheme()
                     }),
                     baseLayerPicker : false,
                     terrainProvider : self.terrainProvider,
