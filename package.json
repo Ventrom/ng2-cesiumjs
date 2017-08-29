@@ -1,94 +1,29 @@
 {
-  "_args": [
-    [
-      {
-        "raw": "ng2-cesiumjs@github:ventrom/ng2-cesiumjs",
-        "scope": null,
-        "escapedName": "ng2-cesiumjs",
-        "name": "ng2-cesiumjs",
-        "rawSpec": "github:ventrom/ng2-cesiumjs",
-        "spec": "github:ventrom/ng2-cesiumjs",
-        "type": "hosted",
-        "hosted": {
-          "type": "github",
-          "ssh": "git@github.com:ventrom/ng2-cesiumjs.git",
-          "sshUrl": "git+ssh://git@github.com/ventrom/ng2-cesiumjs.git",
-          "httpsUrl": "git+https://github.com/ventrom/ng2-cesiumjs.git",
-          "gitUrl": "git://github.com/ventrom/ng2-cesiumjs.git",
-          "shortcut": "github:ventrom/ng2-cesiumjs",
-          "directUrl": "https://raw.githubusercontent.com/ventrom/ng2-cesiumjs/master/package.json"
-        }
-      },
-      "D:\\Toptal\\Company Projects\\Ventrom LLC\\master-test\\data-explorer-seed"
-    ]
+  "name": "ng2-cesiumjs",
+  "version": "1.0.0",
+  "description": "Angular components for WebGL scenes using Cesiumjs",
+  "main": "index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ventrom/ng2-cesiumjs.git"
+  },
+  "keywords": [
+    "angular",
+    "cesium"
   ],
-  "_from": "ventrom/ng2-cesiumjs",
-  "_id": "ng2-cesiumjs@1.0.0",
-  "_inCache": true,
-  "_location": "/ng2-cesiumjs",
-  "_phantomChildren": {
-    "array-union": "1.0.2",
-    "code-point-at": "1.1.0",
-    "decamelize": "1.2.0",
-    "execa": "0.7.0",
-    "get-caller-file": "1.0.2",
-    "glob": "7.1.2",
-    "graceful-fs": "4.1.11",
-    "is-fullwidth-code-point": "1.0.0",
-    "lcid": "1.0.0",
-    "locate-path": "2.0.0",
-    "mem": "1.1.0",
-    "normalize-package-data": "2.4.0",
-    "object-assign": "4.1.1",
-    "parse-json": "2.2.0",
-    "pify": "2.3.0",
-    "pinkie-promise": "2.0.1",
-    "require-directory": "2.1.1",
-    "require-main-filename": "1.0.1",
-    "set-blocking": "2.0.0",
-    "strip-ansi": "3.0.1",
-    "wrap-ansi": "2.1.0",
-    "y18n": "3.2.1"
-  },
-  "_requested": {
-    "raw": "ng2-cesiumjs@github:ventrom/ng2-cesiumjs",
-    "scope": null,
-    "escapedName": "ng2-cesiumjs",
-    "name": "ng2-cesiumjs",
-    "rawSpec": "github:ventrom/ng2-cesiumjs",
-    "spec": "github:ventrom/ng2-cesiumjs",
-    "type": "hosted",
-    "hosted": {
-      "type": "github",
-      "ssh": "git@github.com:ventrom/ng2-cesiumjs.git",
-      "sshUrl": "git+ssh://git@github.com/ventrom/ng2-cesiumjs.git",
-      "httpsUrl": "git+https://github.com/ventrom/ng2-cesiumjs.git",
-      "gitUrl": "git://github.com/ventrom/ng2-cesiumjs.git",
-      "shortcut": "github:ventrom/ng2-cesiumjs",
-      "directUrl": "https://raw.githubusercontent.com/ventrom/ng2-cesiumjs/master/package.json"
-    }
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "git://github.com/ventrom/ng2-cesiumjs.git#377b2df22d8316b4e78dd137dcbddfa1a2850581",
-  "_shasum": "8c3a107ba64047e78b014b50ea57984cacd0d408",
-  "_shrinkwrap": null,
-  "_spec": "ng2-cesiumjs@github:ventrom/ng2-cesiumjs",
-  "_where": "D:\\Toptal\\Company Projects\\Ventrom LLC\\master-test\\data-explorer-seed",
-  "author": {
-    "name": "Ventrom LLC"
-  },
+  "author": "Ventrom LLC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Ventrom/ng2-cesiumjs/issues"
   },
+  "homepage": "https://github.com/Ventrom/ng2-dcjs#readme",
   "dependencies": {
     "@angular/common": "^4.1.0",
     "@angular/core": "^4.1.0",
-    "almond": "^0.3.3",
+	"almond": "^0.3.3",
     "aws-sdk": "^2.18.0",
     "bluebird": "^3.4.6",
-    "cesium-elevation-gradient": "github:propelleraero/cesium-elevation-gradient",
+	"cesium-elevation-gradient": "github:propelleraero/cesium-elevation-gradient",
     "compressible": "^2.0.9",
     "compression": "^1.6.2",
     "electron": "^1.6.1",
@@ -120,31 +55,13 @@
     "mime": "^1.3.4",
     "mkdirp": "^0.5.1",
     "request": "^2.79.0",
-    "requirejs": "^2.3.2",
+	"requirejs": "^2.3.2",
     "rimraf": "^2.6.1",
-    "rxjs": "^5.0.1",
-    "yargs": "^8.0.1",
-    "zone.js": "^0.8.4"
+	"rxjs": "^5.0.1",
+	"zone.js": "^0.8.4",
+	"yargs": "^8.0.1"
   },
-  "description": "Angular components for WebGL scenes using Cesiumjs",
   "devDependencies": {
     "typescript": "~2.1.0"
-  },
-  "gitHead": "377b2df22d8316b4e78dd137dcbddfa1a2850581",
-  "homepage": "https://github.com/Ventrom/ng2-dcjs#readme",
-  "keywords": [
-    "angular",
-    "cesium"
-  ],
-  "license": "MIT",
-  "main": "index.ts",
-  "name": "ng2-cesiumjs",
-  "optionalDependencies": {},
-  "readme": "# Angular components for WebGL scenes using Cesiumjs\r\n[![Build Status](https://travis-ci.org/Ventrom/Ventrom/ng2-cesiumjs.svg?branch=master)](https://travis-ci.org/Ventrom/Ventrom/ng2-cesiumjs)\r\n[![npm version](https://badge.fury.io/js/ng2-cesiumjs.svg)](http://badge.fury.io/js/ng2-cesiumjs)\r\n[![devDependency Status](https://david-dm.org/Ventrom/Ventrom/ng2-cesiumjs/dev-status.svg)](https://david-dm.org/Ventrom/Ventrom/ng2-cesiumjs#info=devDependencies)\r\n[![GitHub issues](https://img.shields.io/github/issues/Ventrom/Ventrom/ng2-cesiumjs.svg)](https://github.com/Ventrom/Ventrom/ng2-cesiumjs/issues)\r\n[![GitHub stars](https://img.shields.io/github/stars/Ventrom/Ventrom/ng2-cesiumjs.svg)](https://github.com/Ventrom/Ventrom/ng2-cesiumjs/stargazers)\r\n[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Ventrom/Ventrom/ng2-cesiumjs/master/LICENSE)\r\n\r\n## Table of contents\r\n\r\n- [About](#about)\r\n- [Installation](#installation)\r\n- [Documentation](#documentation)\r\n- [Development](#development)\r\n- [License](#licence)\r\n\r\n## About\r\n\r\nA collection of Angular2 components to render WebGL scenes using Cesiumjs\r\n\r\n## Installation\r\n\r\nInstall through npm:\r\n```\r\nnpm install --save ng2-cesiumjs\r\n```\r\n\r\nTo use the module, first import it in your app:\r\n\r\n```typescript\r\nimport { NgModule } from '@angular/core';\r\nimport { BrowserModule } from '@angular/platform-browser';\r\nimport { Ng2CesiumjsModule } from 'ng2-cesiumjs';\r\nimport { AppComponent } from './app.component';\r\n\r\n@NgModule({\r\n    declarations: [\r\n        AppComponent\r\n    ],\r\n    imports: [\r\n        BrowserModule,\r\n        Ng2CesiumjsModule\r\n    ],\r\n    declarations: [],\r\n    bootstrap:    [ AppComponent ]\r\n})\r\nexport class AppModule {}\r\n```\r\n\r\n## Documentation\r\nAll documentation is auto-generated from the source via typedoc and can be viewed here:\r\nhttps://Ventrom.github.io/Ventrom/ng2-cesiumjs/docs/\r\n\r\n## Development\r\n\r\n### Prepare your environment\r\n* Install [Node.js](http://nodejs.org/) and NPM (should come with)\r\n* Install local dev dependencies: `npm install` while current directory is this repo\r\n\r\n## License\r\n\r\nMIT\r\n",
-  "readmeFilename": "README.md",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Ventrom/ng2-cesiumjs.git"
-  },
-  "version": "1.0.0"
+  }
 }
